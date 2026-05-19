@@ -9,6 +9,21 @@ export default function Layout() {
         <Stack.Screen
             name='home'
             // options={{ headerShown: false }}
+            options={{
+                
+                headerShown: true,
+                headerStyle: {
+                    backgroundColor: '#0B3B63'
+                },
+                headerTintColor: '#fff',
+                headerTitleStyle: {
+                    fontWeight: 'bold'
+                },
+                headerTitleAlign: 'center'
+            }}
+
         />
+
+
     </Stack>);
 }
