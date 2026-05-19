@@ -63,26 +63,13 @@ export default function Login() {
                 </View>
 
                 <View style={styles.espacamentoBotoes}>
-                    <Button01 title="Cadastrar"
+                    <Button02 title="Cadastrar"
                         onPress={cadastrar} />
-                    {/* <Pressable android_ripple={{ color: 'blue' }} style={styles.botao}
-                        onPress={cadastrar}>
 
-                        <View style={styles.btnArea}>
-                            <Text style={styles.btnTexto}>Cadastrar</Text>
-                        </View>
-                    </Pressable> */}
-
-                    <Button02 title="Entrar"
+                    <Button01 title="Entrar"
                         // onPress={entrar}
-                        onPress={() => router.replace('/home')} />
-{/* 
-                    <Pressable style={[styles.botao, { backgroundColor: '#466DC2' }]}
-                        onPress={entrar}>
-                        <View style={styles.btnArea}>
-                            <Text style={styles.btnTexto}>Entrar</Text>
-                        </View>
-                    </Pressable> */}
+                        onPress={() => router.replace('/home')} 
+                    />
                 </View>
 
             </View>

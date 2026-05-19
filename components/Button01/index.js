@@ -1,10 +1,14 @@
 import { Pressable, StyleSheet, Text } from "react-native";
 
-export const Button01 = ({ onPress, title }) => {
+export const Button01 = ({ onPress, title, backgroundColor }) => {
     return (
         <Pressable
-            style={styles.btn}
-            onPress={onPress}>
+            style={[
+                styles.btn,
+                { backgroundColor: backgroundColor || '#0B3B63' }
+            ]}
+            onPress={onPress}
+        >
             <Text style={styles.btnTexto}>{title}</Text>
         </Pressable>
     )
