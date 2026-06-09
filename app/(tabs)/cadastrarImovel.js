@@ -26,7 +26,7 @@ export default function CadastrarImovel() {
     const [telefoneProprietario, setTelefoneProprietario] = useState('');
     const [emailProprietario, setEmailProprietario] = useState('');
 
-    const [tipoMovimentacao, setTipoMovimentacao] = useState('entrada');
+    const [tipoLocacao, setTipoLocacao] = useState('residencial');
 
     // A tela de cadastro gerencia o dado bruto que vai para o banco
     const [imagemImovel, setImagemImovel] = useState(null);
@@ -162,18 +162,18 @@ export default function CadastrarImovel() {
                 />
 
                 <View style={styles.fieldContainer}>
-                    <Text style={styles.text}>Tipo de movimentação: *</Text>
+                    <Text style={styles.text}>Tipo de locação: *</Text>
 
                     <View style={styles.checkBoxArea}>
                         <CheckBox
-                            label="Entrada"
-                            isSelected={tipoMovimentacao === 'entrada'}
-                            onPress={() => setTipoMovimentacao('entrada')}
+                            label="Residencial"
+                            isSelected={tipoLocacao === 'residencial'}
+                            onPress={() => setTipoLocacao('residencial')}
                         />
                         <CheckBox
-                            label="Saída"
-                            isSelected={tipoMovimentacao === 'saida'}
-                            onPress={() => setTipoMovimentacao('saida')}
+                            label="Temporada"
+                            isSelected={tipoLocacao === 'temporada'}
+                            onPress={() => setTipoLocacao('temporada')}
                         />
                     </View>
                 </View>
