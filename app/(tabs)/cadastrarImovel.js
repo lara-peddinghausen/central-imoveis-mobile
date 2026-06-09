@@ -28,6 +28,8 @@ export default function CadastrarImovel() {
 
     const [tipoLocacao, setTipoLocacao] = useState('residencial');
 
+    const [submitted, setSubmitted] = useState(false);
+
     // A tela de cadastro gerencia o dado bruto que vai para o banco
     const [imagemImovel, setImagemImovel] = useState(null);
 
@@ -39,6 +41,31 @@ export default function CadastrarImovel() {
 
         // Aqui você faz o seu push/fetch enviando o objeto incluindo o 'imagemImovel'
         console.log("Pronto para enviar para o servidor. URI da imagem:", imagemImovel);
+    };
+
+    const cadastrar = () => {
+        setSubmitted(true);
+
+        const camposObrigatoriosInvalidos =
+            !nomeImovel.trim() ||
+            !cep.trim() ||
+            !rua.trim() ||
+            !numero.trim() ||
+            !bairro.trim() ||
+            !cidade.trim() ||
+            !estado.trim();
+
+        if (camposObrigatoriosInvalidos) {
+            Alert.alert('Erro', 'Preencha todos os campos obrigatórios');
+            return;
+        }
+
+        if (!imagemImovel) {
+            Alert.alert('Aviso', 'Adicione uma imagem do imóvel');
+            return;
+        }
+
+        console.log('enviar formulário');
     };
 
     async function buscarCepAutomatico(cepDigitado) {
@@ -99,14 +126,16 @@ export default function CadastrarImovel() {
                 <Text style={styles.formTitle}> Preencha os dados do imóvel </Text>
 
                 <InputItem
-                    label='Nome do Imóvel*'
+                    label='Nome do Imóvel *'
                     placeholder='Ex: Apartamento no Centro'
                     value={nomeImovel}
                     onChangeText={(texto) => setNomeImovel(texto)}
+                    isRequired
+                    error={submitted && !nomeImovel.trim()}
                 />
 
                 <InputItem
-                    label='CEP*'
+                    label='CEP *'
                     placeholder='Digite o CEP do imóvel'
                     value={cep}
                     keyboardType='numeric'
@@ -115,21 +144,27 @@ export default function CadastrarImovel() {
                         setCep(cepLido);
                         buscarCepAutomatico(cepLido);
                     }}
+                    isRequired
+                    error={submitted && !cep.trim()}
                 />
 
                 <InputItem
-                    label='Rua*'
+                    label='Rua *'
                     placeholder='Nome da rua ou avenida'
                     value={rua}
                     onChangeText={(texto) => setRua(texto)}
+                    isRequired
+                    error={submitted && !rua.trim()}
                 />
 
                 <InputItem
-                    label='Número*'
+                    label='Número *'
                     placeholder='Digite o número do imóvel'
                     value={numero}
                     keyboardType='numeric'
                     onChangeText={(texto) => setNumero(texto)}
+                    isRequired
+                    error={submitted && !numero.trim()}
                 />
 
                 <InputItem
@@ -140,25 +175,32 @@ export default function CadastrarImovel() {
                 />
 
                 <InputItem
-                    label='Bairro*'
+                    label='Bairro *'
                     placeholder='Nome do bairro'
                     value={bairro}
                     onChangeText={(texto) => setBairro(texto)}
+                    isRequired
+                    error={submitted && !bairro.trim()}
+
                 />
 
                 <InputItem
-                    label='Cidade*'
+                    label='Cidade *'
                     placeholder='Cidade do imóvel'
                     value={cidade}
                     onChangeText={(texto) => setCidade(texto)}
+                    isRequired
+                    error={submitted && !cidade.trim()}
                 />
 
                 <InputItem
-                    label='Estado*'
+                    label='Estado *'
                     placeholder='UF (Ex: SP, RJ, SC)'
                     value={estado}
                     maxLength={2}
                     onChangeText={(texto) => setEstado(texto)}
+                    isRequired
+                    error={submitted && !estado.trim()}
                 />
 
                 <View style={styles.fieldContainer}>
@@ -178,9 +220,7 @@ export default function CadastrarImovel() {
                     </View>
                 </View>
 
-
                 <ImageSelector onImageSelected={(uri) => setImagemImovel(uri)} />
-
 
             </View>
 
@@ -214,18 +254,22 @@ export default function CadastrarImovel() {
                 />
             </View>
 
-            <Text>* Campos obrigatórios</Text>
+            <View style={styles.alertArea}>
+                <Text style={styles.alertText}>* Campos obrigatórios</Text>
+            </View>
 
-            <ButtonDark
-                title="Cadastrar"
-                // onPress={cadastrar}
-                flex
-            />
-            <ButtonLight
-                title="Cancelar"
-                // onPress={cancelar}
-                flex
-            />
+            <View style={styles.buttonArea}>
+                <ButtonDark
+                    title="Cadastrar"
+                    onPress={cadastrar}
+                    flex
+                />
+                <ButtonLight
+                    title="Cancelar"
+                    // onPress={cancelar}
+                    flex
+                />
+            </View>
 
 
         </ScrollView >
@@ -295,4 +339,16 @@ const styles = StyleSheet.create({
         backgroundColor: COLORS.white,
         alignItems: 'flex-start'
     },
+    alertArea: {
+        alignSelf: 'flex-start',
+        marginLeft: 20
+    },
+    alertText: {
+        fontStyle: 'italic',
+        color: COLORS.red,
+        textAlign: 'left'
+    },
+    buttonArea: {
+        flexDirection: 'row'
+    }
 });
