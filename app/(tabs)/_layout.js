@@ -60,6 +60,7 @@ export default function TabsLayout() {
             <Tabs.Screen
                 name="perfil"
                 options={{
+                    headerShown: false,
                     tabBarLabel: 'Perfil',
                     tabBarIcon: ({ color }) => (
                         <IconPerfil color={color} />
