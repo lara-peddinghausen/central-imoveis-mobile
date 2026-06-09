@@ -10,18 +10,18 @@ export default function InputItem({
     value,
     onChangeText,
     secureTextEntry = false,
+    error = false,
 }) {
 
     const [mostrarSenha, setMostrarSenha] = useState(false);
 
     return (
-        <View>
+        <View style={styles.wrapper}>
 
-            <Text style={styles.text}>
-                {label}
-            </Text>
+            <Text style={styles.text}> {label} </Text>
 
-            <View style={styles.container}>
+
+            <View style={[styles.container, error && styles.containerError]}>
 
                 <TextInput
                     style={styles.input}
@@ -48,12 +48,17 @@ export default function InputItem({
 
             </View>
 
+
         </View>
+
     );
 
 }
 
 const styles = StyleSheet.create({
+    wrapper: {
+        marginBottom: 10,
+    },
     text: {
         marginLeft: 10,
         marginTop: 20,
@@ -71,12 +76,17 @@ const styles = StyleSheet.create({
         width: '90%',
         paddingTop: 3,
     },
+    containerError: {
+        borderColor: COLORS.red,
+        borderWidth: 2
+    },
     input: {
         width: 250,
         height: 40,
+        flex: 1,
         // borderWidth: 1,
         // borderRadius: 5,
-        margin: 10,
+        // margin: 10,
         fontSize: FONT_SIZE.small,
-    }
+    },
 })
