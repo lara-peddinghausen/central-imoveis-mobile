@@ -1,16 +1,45 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Button, Alert } from 'react-native';
 import { COLORS } from '../../src/theme/colors';
 import InputItem from '../../src/components/InputItem';
 import { useState } from 'react';
-import apiCorreios from '../../src/services/api.js';
+import { apiCorreios } from '../../src/services/api.js';
+import CheckBox from '../../src/components/CheckBox/index.js';
+import { FONT_SIZE } from '../../src/theme/typography.js';
+import { ButtonDark } from '../../src/components/ButtonDark/index.js';
+import { ButtonLight } from '../../src/components/ButtonLight/index.js';
+import ImageSelector from '../../src/components/ImageSelector/index.js';
+
 
 export default function CadastrarImovel() {
 
+    const [nomeImovel, setNomeImovel] = useState('');
     const [cep, setCep] = useState('');
-    const [bairro, setBairro] = useState('');
     const [rua, setRua] = useState('');
     const [numero, setNumero] = useState('');
     const [complemento, setComplemento] = useState('');
+    const [bairro, setBairro] = useState('');
+    const [cidade, setCidade] = useState('');
+    const [estado, setEstado] = useState('');
+
+    const [nomeProprietario, setNomeProprietario] = useState('');
+    const [cpfProprietario, setCpfProprietario] = useState('');
+    const [telefoneProprietario, setTelefoneProprietario] = useState('');
+    const [emailProprietario, setEmailProprietario] = useState('');
+
+    const [tipoMovimentacao, setTipoMovimentacao] = useState('entrada');
+
+    // A tela de cadastro gerencia o dado bruto que vai para o banco
+    const [imagemImovel, setImagemImovel] = useState(null);
+
+    const handleSalvarImovel = () => {
+        if (!imagemImovel) {
+            Alert.alert("Aviso", "Por favor, adicione uma imagem do imóvel.");
+            return;
+        }
+
+        // Aqui você faz o seu push/fetch enviando o objeto incluindo o 'imagemImovel'
+        console.log("Pronto para enviar para o servidor. URI da imagem:", imagemImovel);
+    };
 
     async function buscarCepAutomatico(cepDigitado) {
         const cepLimpo = cepDigitado.replace(/\D/g, '');
@@ -19,30 +48,27 @@ export default function CadastrarImovel() {
             try {
                 const response = await apiCorreios.get(`/${cepLimpo}/json`);
 
-                // 1. Trata se o ViaCEP retornou que o CEP não existe na base deles
                 if (response.data.erro === true || response.data.erro === 'true') {
                     alert('Este CEP não foi encontrado. Por favor, verifique os números.');
                     limparCamposEndereco();
                     return;
                 }
 
-                // Se deu certo, preenche os campos
-                setBairro(response.data.bairro || '');
+                // Preenche os campos retornados pela API
                 setRua(response.data.logradouro || '');
+                setBairro(response.data.bairro || '');
+                setCidade(response.data.localidade || '');
+                setEstado(response.data.uf || '');
 
             } catch (error) {
-                // 2 e 3. Trata erros de rede, servidor fora do ar ou requisições malformadas
-                console.log('Erro na requisição do ViaCEP:', error);
+                console.error("DEBUG CEP:", error.message);
 
                 if (error.response) {
-                    // O servidor respondeu com um status fora do range 2xx (Ex: 400 Bad Request)
                     alert('Erro ao validar o CEP. Verifique o formato digitado.');
                 } else if (error.request) {
-                    // A requisição foi feita mas não houve resposta (Sem internet)
                     alert('Não foi possível conectar ao serviço de CEP. Verifique sua conexão com a internet.');
                 } else {
-                    // Outros erros inesperados
-                    alert('Ocorreu um erro inesperados ao buscar o CEP.');
+                    alert('Ocorreu um erro inesperado ao buscar o CEP.');
                 }
 
                 limparCamposEndereco();
@@ -50,10 +76,11 @@ export default function CadastrarImovel() {
         }
     }
 
-    // Função auxiliar para limpar a tela se o CEP falhar (evita lixo na tela)
     function limparCamposEndereco() {
-        setBairro('');
         setRua('');
+        setBairro('');
+        setCidade('');
+        setEstado('');
     }
 
     return (
@@ -62,61 +89,143 @@ export default function CadastrarImovel() {
             showsVerticalScrollIndicator={false}
         >
 
-            <View style={styles.areaTitulo} >
-                <View style={styles.linha} />
-                <Text style={styles.titulo}>Cadastro de Imóvel</Text>
-                <View style={styles.linha} />
+            <View style={styles.titleArea} >
+                <View style={styles.line} />
+                <Text style={styles.title}>Cadastrar Imóvel</Text>
+                <View style={styles.line} />
             </View>
 
-            <View style={styles.areaFormulario}>
-                <Text style={styles.tituloFormulario}>
-                    Preencha os dados do imóvel
-                </Text>
+            <View style={styles.formArea}>
+                <Text style={styles.formTitle}> Preencha os dados do imóvel </Text>
+
                 <InputItem
                     label='Nome do Imóvel*'
                     placeholder='Ex: Apartamento no Centro'
-                    value={''}
-                    onChangeText={() => { }}
+                    value={nomeImovel}
+                    onChangeText={(texto) => setNomeImovel(texto)}
                 />
+
                 <InputItem
-                    label='Cep*'
-                    placeholder='Cep do imóvel'
+                    label='CEP*'
+                    placeholder='Digite o CEP do imóvel'
                     value={cep}
-                    keyboardType='numeric' // Abre o teclado numérico no celular
-                    maxLength={8} // Impede o usuário de digitar mais de 8 números
+                    keyboardType='numeric'
+                    maxLength={8}
                     onChangeText={(cepLido) => {
                         setCep(cepLido);
-                        buscarCepAutomatico(cepLido); // Dispara a busca a cada dígito
+                        buscarCepAutomatico(cepLido);
                     }}
-                />
-                <InputItem
-                    label='Bairro*'
-                    placeholder='Nome do bairro'
-                    value={bairro} // Agora exibe o que veio da API
-                    onChangeText={(texto) => setBairro(texto)}
                 />
 
                 <InputItem
                     label='Rua*'
-                    placeholder='Nome da rua'
-                    value={rua} // Agora exibe o que veio da API
+                    placeholder='Nome da rua ou avenida'
+                    value={rua}
                     onChangeText={(texto) => setRua(texto)}
                 />
 
                 <InputItem
                     label='Número*'
-                    placeholder='Número do prédio/casa'
+                    placeholder='Digite o número do imóvel'
                     value={numero}
+                    keyboardType='numeric'
                     onChangeText={(texto) => setNumero(texto)}
                 />
 
                 <InputItem
                     label='Complemento'
-                    placeholder='Apartamento, bloco, etc (opcional)'
+                    placeholder='Apto, Bloco, Sala, etc. (Opcional)'
                     value={complemento}
                     onChangeText={(texto) => setComplemento(texto)}
                 />
+
+                <InputItem
+                    label='Bairro*'
+                    placeholder='Nome do bairro'
+                    value={bairro}
+                    onChangeText={(texto) => setBairro(texto)}
+                />
+
+                <InputItem
+                    label='Cidade*'
+                    placeholder='Cidade do imóvel'
+                    value={cidade}
+                    onChangeText={(texto) => setCidade(texto)}
+                />
+
+                <InputItem
+                    label='Estado*'
+                    placeholder='UF (Ex: SP, RJ, SC)'
+                    value={estado}
+                    maxLength={2}
+                    onChangeText={(texto) => setEstado(texto)}
+                />
+
+                <View style={styles.fieldContainer}>
+                    <Text style={styles.text}>Tipo de movimentação: *</Text>
+
+                    <View style={styles.checkBoxArea}>
+                        <CheckBox
+                            label="Entrada"
+                            isSelected={tipoMovimentacao === 'entrada'}
+                            onPress={() => setTipoMovimentacao('entrada')}
+                        />
+                        <CheckBox
+                            label="Saída"
+                            isSelected={tipoMovimentacao === 'saida'}
+                            onPress={() => setTipoMovimentacao('saida')}
+                        />
+                    </View>
+                </View>
+
+
+                <ImageSelector onImageSelected={(uri) => setImagemImovel(uri)} />
+
+
             </View>
+
+
+            <View style={styles.formArea}>
+                <Text style={styles.formTitle}> Preencha os dados do proprietário </Text>
+                <Text>(Opcional)</Text>
+                <InputItem
+                    label='Nome'
+                    placeholder='Digite o nome do proprietário'
+                    value={nomeProprietario}
+                    onChangeText={(texto) => setNomeProprietario(texto)}
+                />
+                <InputItem
+                    label='CPF'
+                    placeholder='Apenas números, sem pontos ou traços'
+                    value={cpfProprietario}
+                    onChangeText={(texto) => setCpfProprietario(texto)}
+                />
+                <InputItem
+                    label='Telefone'
+                    placeholder='(xx) xxxxx-xxxx'
+                    value={telefoneProprietario}
+                    onChangeText={(texto) => setTelefoneProprietario(texto)}
+                />
+                <InputItem
+                    label='E-mail'
+                    placeholder='email@email.com'
+                    value={emailProprietario}
+                    onChangeText={(texto) => setEmailProprietario(texto)}
+                />
+            </View>
+
+            <Text>* Campos obrigatórios</Text>
+
+            <ButtonDark
+                title="Cadastrar"
+                // onPress={cadastrar}
+                flex
+            />
+            <ButtonLight
+                title="Cancelar"
+                // onPress={cancelar}
+                flex
+            />
 
 
         </ScrollView >
@@ -125,6 +234,7 @@ export default function CadastrarImovel() {
 
 const styles = StyleSheet.create({
     container: {
+        paddingTop: 80,
         flexGrow: 1,
         backgroundColor: COLORS.white,
         justifyContent: 'center',
@@ -133,35 +243,56 @@ const styles = StyleSheet.create({
         gap: 20,
         paddingVertical: 20
     },
-    areaTitulo: {
+    titleArea: {
+        marginBottom: 20,
         flexDirection: 'row',
         alignItems: 'center',
-
     },
-    linha: {
+    line: {
         width: '30%',
         height: 2,
         backgroundColor: COLORS.darkBlue,
         marginHorizontal: 20,
     },
-    titulo: {
-        fontSize: 24,
+    title: {
+        fontSize: FONT_SIZE.xlarge,
         color: COLORS.darkBlue,
         fontWeight: 'bold',
-
     },
-    areaFormulario: {
+    formArea: {
         borderWidth: 1,
         borderColor: COLORS.grey,
         borderRadius: 10,
         width: '90%',
         alignItems: 'center',
+        paddingBottom: 15,
     },
-    tituloFormulario: {
-        fontSize: 18,
+    formTitle: {
+        fontSize: FONT_SIZE.large,
         color: COLORS.darkBlue,
         fontWeight: 'bold',
+        marginVertical: 15,
+    },
+    fieldContainer: {
+        padding: 20,
+        alignSelf: 'flex-start',
         marginVertical: 10,
-    }
-})
+        marginLeft: 15
 
+    },
+    text: {
+        fontSize: FONT_SIZE.small,
+        marginBottom: 10,
+        color: COLORS.black,
+
+    },
+    checkBoxArea: {
+        flexDirection: 'row',
+
+    },
+    imageArea: {
+        padding: 20,
+        backgroundColor: COLORS.white,
+        alignItems: 'flex-start'
+    },
+});
