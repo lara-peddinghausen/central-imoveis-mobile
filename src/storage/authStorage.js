@@ -1,0 +1,1 @@
+// Responsável apenas por persistência.
