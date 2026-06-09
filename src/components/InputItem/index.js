@@ -2,6 +2,7 @@ import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-nativ
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
 import { COLORS } from '../../theme/colors';
+import { FONT_SIZE } from '../../theme/typography';
 
 export default function InputItem({
     label,
@@ -20,7 +21,7 @@ export default function InputItem({
                 {label}
             </Text>
 
-            <View style={styles.inputContainer}>
+            <View style={styles.container}>
 
                 <TextInput
                     style={styles.input}
@@ -55,10 +56,11 @@ export default function InputItem({
 const styles = StyleSheet.create({
     text: {
         marginLeft: 10,
-        marginTop: 20
+        marginTop: 20,
+        fontSize: FONT_SIZE.small,
 
     },
-    inputContainer: {
+    container: {
         flexDirection: 'row',
         alignItems: 'center',
         borderWidth: 1,
@@ -67,6 +69,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         height: 40,
         width: '90%',
+        paddingTop: 3,
     },
     input: {
         width: 250,
@@ -74,5 +77,6 @@ const styles = StyleSheet.create({
         // borderWidth: 1,
         // borderRadius: 5,
         margin: 10,
+        fontSize: FONT_SIZE.small,
     }
 })
