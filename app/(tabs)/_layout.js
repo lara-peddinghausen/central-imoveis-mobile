@@ -49,6 +49,7 @@ export default function TabsLayout() {
             <Tabs.Screen
                 name="cadastrarImovel"
                 options={{
+                    headerShown: false,
                     tabBarLabel: 'Cadastrar',
                     tabBarIcon: ({ color }) => (
                         <IconCadastrarImovel color={color} bgColor={COLORS.darkBlue} />
