@@ -7,22 +7,53 @@ import apiCorreios from '../../src/services/api.js';
 export default function CadastrarImovel() {
 
     const [cep, setCep] = useState('');
+    const [bairro, setBairro] = useState('');
+    const [rua, setRua] = useState('');
+    const [numero, setNumero] = useState('');
+    const [complemento, setComplemento] = useState('');
 
-    const [dados, setDados] = useState('')
+    async function buscarCepAutomatico(cepDigitado) {
+        const cepLimpo = cepDigitado.replace(/\D/g, '');
 
-    async function buscar() {
-        if (cep == '') {
-            alert('Digite um CEP válido')
-            return
+        if (cepLimpo.length === 8) {
+            try {
+                const response = await apiCorreios.get(`/${cepLimpo}/json`);
+
+                // 1. Trata se o ViaCEP retornou que o CEP não existe na base deles
+                if (response.data.erro === true || response.data.erro === 'true') {
+                    alert('Este CEP não foi encontrado. Por favor, verifique os números.');
+                    limparCamposEndereco();
+                    return;
+                }
+
+                // Se deu certo, preenche os campos
+                setBairro(response.data.bairro || '');
+                setRua(response.data.logradouro || '');
+
+            } catch (error) {
+                // 2 e 3. Trata erros de rede, servidor fora do ar ou requisições malformadas
+                console.log('Erro na requisição do ViaCEP:', error);
+
+                if (error.response) {
+                    // O servidor respondeu com um status fora do range 2xx (Ex: 400 Bad Request)
+                    alert('Erro ao validar o CEP. Verifique o formato digitado.');
+                } else if (error.request) {
+                    // A requisição foi feita mas não houve resposta (Sem internet)
+                    alert('Não foi possível conectar ao serviço de CEP. Verifique sua conexão com a internet.');
+                } else {
+                    // Outros erros inesperados
+                    alert('Ocorreu um erro inesperados ao buscar o CEP.');
+                }
+
+                limparCamposEndereco();
+            }
         }
+    }
 
-        try {
-            const response = await apiCorreios.get(`/${cep}/json`)
-            console.log(response.data);
-            setDados(response.data)
-        } catch (error) {
-            console.log('ERROR: ' + error);
-        }
+    // Função auxiliar para limpar a tela se o CEP falhar (evita lixo na tela)
+    function limparCamposEndereco() {
+        setBairro('');
+        setRua('');
     }
 
     return (
@@ -51,33 +82,40 @@ export default function CadastrarImovel() {
                     label='Cep*'
                     placeholder='Cep do imóvel'
                     value={cep}
-                    onChangeText={(cepLido) => setCep(cepLido)}
+                    keyboardType='numeric' // Abre o teclado numérico no celular
+                    maxLength={8} // Impede o usuário de digitar mais de 8 números
+                    onChangeText={(cepLido) => {
+                        setCep(cepLido);
+                        buscarCepAutomatico(cepLido); // Dispara a busca a cada dígito
+                    }}
                 />
                 <InputItem
                     label='Bairro*'
                     placeholder='Nome do bairro'
-                    value={''}
-                    onChangeText={() => { }}
+                    value={bairro} // Agora exibe o que veio da API
+                    onChangeText={(texto) => setBairro(texto)}
                 />
+
                 <InputItem
                     label='Rua*'
                     placeholder='Nome da rua'
-                    value={''}
-                    onChangeText={() => { }}
+                    value={rua} // Agora exibe o que veio da API
+                    onChangeText={(texto) => setRua(texto)}
                 />
+
                 <InputItem
                     label='Número*'
                     placeholder='Número do prédio/casa'
-                    value={''}
-                    onChangeText={() => { }}
+                    value={numero}
+                    onChangeText={(texto) => setNumero(texto)}
                 />
+
                 <InputItem
                     label='Complemento'
                     placeholder='Apartamento, bloco, etc (opcional)'
-                    value={''}
-                    onChangeText={() => { }}
+                    value={complemento}
+                    onChangeText={(texto) => setComplemento(texto)}
                 />
-
             </View>
 
 
