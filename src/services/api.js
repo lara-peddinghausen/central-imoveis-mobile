@@ -11,4 +11,4 @@ const apiCorreios = axios.create({
     baseURL: 'https://viacep.com.br/ws'
 })
 
-export default { api, apiCorreios };
+export { api, apiCorreios };
