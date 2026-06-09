@@ -1,48 +1,56 @@
 import { router } from "expo-router";
-import React, { Component, useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, TextInput, Alert, Pressable } from 'react-native';
-import { Button01 } from "../components/Button01";
-import { Button02 } from "../components/Button02";
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, Image, TextInput, Alert } from 'react-native';
+import { ButtonDark } from "../src/components/ButtonDark";
+import { ButtonLight } from "../src/components/ButtonLight";
+import { COLORS } from '../src/theme/colors';
+import InputItem from "../src/components/InputItem";
+import { login } from "../src/services/authService";
+import AsyncStorage from '@react-native-async-storage/async-storage'; // Importação adicionada!
 
 export default function Login() {
 
     const [email, setEmail] = useState('');
     const [senha, setSenha] = useState('');
-
     const [logado, setLogado] = useState(false);
 
     useEffect(() => {
         if (logado) {
+            // Como a rota /home agora está dentro da pasta (tabs),
+            // o Expo Router a redirecionará trazendo a barra inferior!
             router.replace('/home');
         }
     }, [logado]);
 
-    const entrar = () => {
+    const entrar = async () => { // Adicionado async para usar o AsyncStorage
 
         if (!email || !senha) {
             Alert.alert('Erro', 'Preencha todos os campos');
             return;
         }
 
-        // Simulação de login
-        if (email === 'teste@gmail.com' && senha === '123') {
-            Alert.alert('Login realizado com sucesso!');
-            setLogado(true)
+        const sucesso = login(email, senha);
 
+        if (sucesso) {
+            // 1. Grava no AsyncStorage para o seu index.js ler no próximo boot
+            await AsyncStorage.setItem('usuario', JSON.stringify({ email: email }));
+            
+            Alert.alert('Sucesso', 'Login realizado com sucesso!');
+            setLogado(true);
         } else {
-            Alert.alert('E-mail ou senha inválidos');
+            Alert.alert('Erro', 'E-mail ou senha inválidos');
         }
     };
 
     const cadastrar = () => {
-        Alert.alert('Não implementado');
+        router.push('/cadastro-admin');
     }
 
     return (
         <View style={styles.container}>
 
             <Image
-                source={require('../assets/images/logo1.png')}
+                source={require('../src/assets/images/logo1.png')}
                 style={styles.img}
                 resizeMode="contain"
             />
@@ -50,34 +58,38 @@ export default function Login() {
             <View style={styles.caixa}>
 
                 <View>
-                    <Text style={{ marginLeft: 10 }}>E-mail</Text>
-                    <TextInput
-                        style={styles.input}
-                        placeholder='E-mail'
-                        onChangeText={setEmail} />
+                    <InputItem
+                        label='E-mail'
+                        placeholder='Digite seu e-mail'
+                        onChangeText={setEmail}
+                    />
 
-                    <Text style={{ marginLeft: 10 }}>Senha</Text>
-                    <TextInput style={styles.input}
-                        placeholder='Senha'
-                        onChangeText={setSenha} />
+                    <InputItem
+                        label='Senha'
+                        placeholder='Digite sua senha'
+                        onChangeText={setSenha}
+                        secureTextEntry={true}
+                    />
                 </View>
 
                 <View style={styles.espacamentoBotoes}>
-                    <Button02 title="Cadastrar"
-                        onPress={cadastrar} />
+                    <ButtonLight 
+                        title="Cadastrar"
+                        onPress={cadastrar} 
+                        flex
+                    />
 
-                    <Button01 title="Entrar"
-                        // onPress={entrar}
-                        onPress={() => router.replace('/home')} 
+                    <ButtonDark 
+                        title="Entrar"
+                        onPress={entrar}
+                        flex
                     />
                 </View>
 
             </View>
 
         </View>
-
     );
-
 }
 
 const styles = StyleSheet.create({
@@ -95,32 +107,6 @@ const styles = StyleSheet.create({
         aspectRatio: 1.12,
         alignSelf: 'center'
     },
-    textoFrase: {
-        fontSize: 20,
-        textAlign: 'center',
-        color: '#dd7d22',
-        fontStyle: 'italic'
-    },
-    botao: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-        // width: 115,
-        // height: 35,
-        borderRadius: 30,
-        backgroundColor: '#0B3B63',
-        margin: 10
-    },
-    btnArea: {
-        justifyContent: 'center',
-        alignItems: 'center',
-        margin: 5
-    },
-    btnTexto: {
-        fontWeight: 'bold',
-        fontSize: 17,
-        color: 'white'
-    },
     espacamentoBotoes: {
         flexDirection: 'row',
         justifyContent: 'space-between'
@@ -137,10 +123,6 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         paddingVertical: 15,
         paddingHorizontal: 24,
-        borderColor: '#C8C8C8'
+        borderColor: COLORS.lightGrey
     }
-
-})
-
-
-
+});
