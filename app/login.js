@@ -22,23 +22,35 @@ export default function Login() {
         }
     }, [logado]);
 
-    const entrar = async () => { // Adicionado async para usar o AsyncStorage
-
+    const entrar = async () => {
         if (!email || !senha) {
             Alert.alert('Erro', 'Preencha todos os campos');
             return;
         }
 
-        const sucesso = login(email, senha);
+        try {
+            // 1. Dispara os dados para o endpoint público do Spring Boot
+            const resposta = await api.post('/auth/login', {
+                email: email,
+                senha: senha
+            });
 
-        if (sucesso) {
-            // 1. Grava no AsyncStorage para o seu index.js ler no próximo boot
-            await AsyncStorage.setItem('usuario', JSON.stringify({ email: email }));
-            
+            // 2. O back retorna o 'DadosTokenJWT' contendo o token string
+            const token = resposta.data.token;
+
+            // 3. Grava o Token real no celular para o seu index.js fazer o Auth Gate
+            await AsyncStorage.setItem('usuario', token);
+
             Alert.alert('Sucesso', 'Login realizado com sucesso!');
-            setLogado(true);
-        } else {
-            Alert.alert('Erro', 'E-mail ou senha inválidos');
+            setLogado(true); // Seu useEffect vai disparar o router.replace('/home')
+
+        } catch (error) {
+            // Captura erros de credenciais incorretas ou servidor fora do ar
+            if (error.response) {
+                Alert.alert('Erro de Autenticação', 'E-mail ou senha inválidos.');
+            } else {
+                Alert.alert('Erro de Conexão', 'Não foi possível conectar ao servidor backend.');
+            }
         }
     };
 
@@ -73,13 +85,13 @@ export default function Login() {
                 </View>
 
                 <View style={styles.espacamentoBotoes}>
-                    <ButtonLight 
+                    <ButtonLight
                         title="Cadastrar"
-                        onPress={cadastrar} 
+                        onPress={cadastrar}
                         flex
                     />
 
-                    <ButtonDark 
+                    <ButtonDark
                         title="Entrar"
                         onPress={entrar}
                         flex
