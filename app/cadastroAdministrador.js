@@ -1,11 +1,15 @@
-import { ScrollView, StyleSheet, View } from "react-native";
-import InputItem from "../../src/components/InputItem";
-import { COLORS } from "../../src/theme/colors";
-import { FONT_SIZE } from "../../src/theme/typography";
-import { api } from '../../src/services/api.js';
+import { Alert, ScrollView, StyleSheet, View } from "react-native";
+import { COLORS } from "../src/theme/colors";
+import { FONT_SIZE } from "../src/theme/typography";
+import { api } from '../src/services/api.js';
 import { useState } from "react";
+import { ButtonDark } from "../src/components/ButtonDark/index.js";
+import { ButtonLight } from "../src/components/ButtonLight/index.js";
+import InputItem from "../src/components/InputItem/index.js";
+import { useNavigation, useRouter } from "expo-router";
 
 export default function CadastroAdministrador() {
+    const router = useRouter();
 
     const [nome, setNome] = useState('');
     const [email, setEmail] = useState('');
@@ -30,20 +34,15 @@ export default function CadastroAdministrador() {
         try {
             // Mapeia os dados exatamente como o record DadosCadastroAdministrador espera no Java
             const dadosParaEnvio = {
-                nome: nome,
-                email: email,
-                dataNascimento: dataNascimento, // Certifique-se de que o Back trate a String ou mande no formato correto
-                senha:senha, // Exemplo ou substitua pela propriedade do seu DTO
+                nome,
+                email,
+                dataNascimento, // Certifique-se de que o Back trate a String ou mande no formato correto
+                senha, // Exemplo ou substitua pela propriedade do seu DTO
                 // Se o seu DTO no back usar apenas nome, email e senha, envie apenas o necessário!
             };
 
             // Dispara para o endpoint que você mapeou no seu AdministradorController
-            const resposta = await api.post('/administrador', {
-                nome,
-                email,
-                dataNascimento,
-                senha // Envia o que o seu DTO real de cadastro pede
-            });
+            const resposta = await api.post('/administrador', dadosParaEnvio);
 
             if (resposta.status === 201 || resposta.status === 200) {
                 Alert.alert('Sucesso!', 'Usuário cadastrado com sucesso.', [
@@ -52,6 +51,7 @@ export default function CadastroAdministrador() {
             }
 
         } catch (error) {
+            console.error("Erro requisição cadastro:", error);
             if (error.response) {
                 Alert.alert('Erro no Cadastro', 'O e-mail informado já pode estar em uso ou os dados são inválidos.');
             } else {
@@ -74,7 +74,7 @@ export default function CadastroAdministrador() {
             </View>
 
             <View style={styles.areaFormulario}>
-                <Text>Preencha seu cadastro</Text>
+                <Text style={styles.subtituloForm}>Preencha seu cadastro</Text>
                 <InputItem
                     label='Nome *'
                     placeholder='Insira seu nome'
@@ -109,8 +109,6 @@ export default function CadastroAdministrador() {
                     onChangeText={setRepetirSenha}
                     secureTextEntry={true}
                 />
-
-                <Text style={styles.textoObrigatorio}>* Campos obrigatórios</Text>
             </View>
 
             <Text style={styles.textoObrigatorio}>* Campos obrigatórios</Text>
@@ -160,22 +158,31 @@ const styles = StyleSheet.create({
     },
     areaFormulario: {
         alignItems: 'center',
-        width: '80%',
+        width: '90',
         borderWidth: 1,
         borderColor: COLORS.lightGrey,
         borderRadius: 10,
         padding: 20,
-        gap: 15
+        gap: 5
 
+    },
+    subtituloForm: {
+        fontSize: FONT_SIZE.small,
+        fontWeight: '500',
+        color: COLORS.black,
+        marginBottom: 10,
     },
     textoObrigatorio: {
         marginTop: 10,
+        alignSelf: 'flex-start',
+        marginLeft: 5,
         fontStyle: 'italic',
         color: COLORS.red
     },
     espacamentoBotoes: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        width: '80%'
+        width: '90%',
+        gap: 10
     },
 })
