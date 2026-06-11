@@ -5,7 +5,6 @@ import { ButtonDark } from "../src/components/ButtonDark";
 import { ButtonLight } from "../src/components/ButtonLight";
 import { COLORS } from '../src/theme/colors';
 import InputItem from "../src/components/InputItem";
-import { login } from "../src/services/authService";
 import AsyncStorage from '@react-native-async-storage/async-storage'; // Importação adicionada!
 
 export default function Login() {
@@ -55,7 +54,7 @@ export default function Login() {
     };
 
     const cadastrar = () => {
-        router.push('/cadastro-admin');
+        router.push('/cadastroAdministrador');
     }
 
     return (
@@ -67,9 +66,9 @@ export default function Login() {
                 resizeMode="contain"
             />
 
-            <View style={styles.caixa}>
+            <View style={styles.inputArea}>
 
-                <View>
+                <View style={styles.fieldsWrapper}>
                     <InputItem
                         label='E-mail'
                         placeholder='Digite seu e-mail'
@@ -84,7 +83,7 @@ export default function Login() {
                     />
                 </View>
 
-                <View style={styles.espacamentoBotoes}>
+                <View style={styles.buttonsArea}>
                     <ButtonLight
                         title="Cadastrar"
                         onPress={cadastrar}
@@ -119,22 +118,22 @@ const styles = StyleSheet.create({
         aspectRatio: 1.12,
         alignSelf: 'center'
     },
-    espacamentoBotoes: {
+    buttonsArea: {
         flexDirection: 'row',
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
+        gap: 10,
     },
-    input: {
-        width: 250,
-        height: 40,
-        borderWidth: 1,
-        borderRadius: 5,
-        margin: 10,
-    },
-    caixa: {
+    inputArea: {
         borderWidth: 1,
         borderRadius: 20,
-        paddingVertical: 15,
+        paddingVertical: 25,
         paddingHorizontal: 24,
-        borderColor: COLORS.lightGrey
-    }
+        borderColor: COLORS.lightGrey,
+        width: '100%',
+        alignSelf: 'center'
+    },
+    fieldsWrapper: {
+        marginBottom: 15, 
+        width: '100%'
+    },
 });
