@@ -58,11 +58,15 @@ export default function InputItem({
 const styles = StyleSheet.create({
     wrapper: {
         marginBottom: 10,
+        width: '100%',
+        // alignItems: 'center'
     },
     text: {
-        marginLeft: 10,
-        marginTop: 20,
+        alignSelf: 'flex-start',
+        marginLeft: 5,
+        marginTop: 5,
         fontSize: FONT_SIZE.small,
+        color: COLORS.black,
 
     },
     container: {
@@ -71,22 +75,23 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: COLORS.black,
         borderRadius: 10,
-        paddingHorizontal: 10,
-        height: 40,
-        width: '90%',
-        paddingTop: 3,
+        paddingHorizontal: 15, 
+        height: 45,
+        width: '100%',
+        // paddingTop: 3,
     },
     containerError: {
         borderColor: COLORS.red,
         borderWidth: 2
     },
     input: {
-        width: 250,
-        height: 40,
+        // width: 250,
+        height: '100%',
         flex: 1,
         // borderWidth: 1,
         // borderRadius: 5,
         // margin: 10,
         fontSize: FONT_SIZE.small,
+        paddingRight: 10,
     },
 })

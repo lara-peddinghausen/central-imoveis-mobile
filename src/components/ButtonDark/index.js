@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, Text } from "react-native";
 import { COLORS } from "../../theme/colors";
+import { FONT_SIZE } from "../../theme/typography";
 
 export const ButtonDark = ({ onPress, title, flex = false }) => {
     return (
@@ -10,7 +11,7 @@ export const ButtonDark = ({ onPress, title, flex = false }) => {
             ]}
             onPress={onPress}
         >
-            <Text style={styles.btnTexto}>{title}</Text>
+            <Text style={styles.btnText}>{title}</Text>
         </Pressable>
     )
 }
@@ -23,14 +24,14 @@ const styles = StyleSheet.create({
         height: 35,
         borderRadius: 30,
         backgroundColor: COLORS.darkBlue,
-        margin: 10,
+        margin: 5,
         marginTop: 20,
-        paddingHorizontal: 30,
+        paddingHorizontal: 12,
     },
-    btnTexto: {
+    btnText: {
         fontWeight: 'bold',
-        fontSize: 17,
+        fontSize: FONT_SIZE.medium,
         color: COLORS.white,
+        textAlign: 'center',
     }
-
 })
