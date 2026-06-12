@@ -1,12 +1,13 @@
 import { Picker } from '@react-native-picker/picker';
 import { useNavigation } from 'expo-router';
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, ScrollView } from 'react-native';
+import React, { useEffect, useState, useContext } from 'react'; // 🚀 Adicionado o useContext
+import { View, Text, StyleSheet, Image, ScrollView, ActivityIndicator } from 'react-native';
 import { IconAlugado, IconDisponivel } from '../../src/components/Icons';
 import ImovelItem from '../../src/components/ImovelItem';
 import { COLORS } from '../../src/theme/colors';
 import { Dropdown } from 'react-native-element-dropdown';
-
+import { AuthContext } from '../../src/context/AuthContext'; // 🚀 Ajuste o caminho para onde está seu AuthContext
+import {api} from '../../src/services/api'; // 🚀 Import do Axios configurado
 
 const properties = [
     { status: 'Alugado', titulo: 'Apartamento X', endereco: 'Rua da Matriz, 21', tipo: 'Residencial' },
@@ -17,7 +18,12 @@ const properties = [
 export default function Home() {
 
     const navigation = useNavigation();
-    const nomeUsuario = 'Lara';
+    const { signOut } = useContext(AuthContext); // Permite deslogar se precisar futuramente
+    
+    // 🚀 Estados para controlar o perfil dinâmico vindo do Spring Boot
+    const [nomeUsuario, setNomeUsuario] = useState(''); // 'Lara' fica como padrão inicial
+    const [carregandoPerfil, setCarregandoPerfil] = useState(true);
+    
     const [imovel, setImovel] = useState('Todos');
     const [filteredProperties, setFilteredProperties] = useState(properties);
 
@@ -27,6 +33,26 @@ export default function Home() {
         { label: 'Disponível', value: 'Disponível' },
     ];
 
+    // 🚀 ADIÇÃO: Carrega o nome real do administrador direto da sua nova rota de Perfil do Backend
+    useEffect(() => {
+        async function buscarPerfilBackend() {
+            try {
+                const response = await api.get('/administrador/perfil');
+                if (response.data && response.data.nome) {
+                    // Divide o nome para pegar apenas o primeiro nome (Ex: "Lara Peddinghausen" vira "Lara")
+                    const primeiroNome = response.data.nome.split(' ')[0];
+                    setNomeUsuario(primeiroNome);
+                }
+            } catch (error) {
+                console.log("Mantendo nome padrão. Motivo:", error.message);
+            } finally {
+                setCarregandoPerfil(false);
+            }
+        }
+        buscarPerfilBackend();
+    }, []);
+
+    // Atualiza o título do cabeçalho assim que o nome chegar do banco de dados
     useEffect(() => {
         navigation.setOptions({
             title: `Olá, ${nomeUsuario}!`
@@ -44,6 +70,15 @@ export default function Home() {
     const totalImoveis = properties.length;
     const imoveisAlugados = properties.filter(p => p.status === 'Alugado').length;
     const imoveisDisponiveis = properties.filter(p => p.status === 'Disponível').length;
+
+    // Enquanto busca o perfil na API, exibe um loading discreto sem quebrar o layout
+    if (carregandoPerfil) {
+        return (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.white }}>
+                <ActivityIndicator size="large" color={COLORS.darkBlue} />
+            </View>
+        );
+    }
 
     return (
 
@@ -124,6 +159,7 @@ export default function Home() {
     )
 }
 
+// ── ESTILOS MANTIDOS 100% INTACTOS ───────────────────────────────────────
 const styles = StyleSheet.create({
     container: {
         flexGrow: 1,
@@ -214,5 +250,4 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: COLORS.black,
     },
-
-})
+});

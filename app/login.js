@@ -1,25 +1,20 @@
-import { router } from "expo-router";
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, TextInput, Alert } from 'react-native';
+import { useRouter } from "expo-router";
+import React, { useState, useContext } from 'react';
+import { View, Image, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import { ButtonDark } from "../src/components/ButtonDark";
 import { ButtonLight } from "../src/components/ButtonLight";
 import { COLORS } from '../src/theme/colors';
 import InputItem from "../src/components/InputItem";
-import AsyncStorage from '@react-native-async-storage/async-storage'; // Importação adicionada!
+// import AsyncStorage from '@react-native-async-storage/async-storage'; // Importação adicionada!
+import { AuthContext } from "../src/context/AuthContext";
 
 export default function Login() {
+    const router = useRouter();
+    const { signIn } = useContext(AuthContext);
 
     const [email, setEmail] = useState('');
     const [senha, setSenha] = useState('');
-    const [logado, setLogado] = useState(false);
-
-    useEffect(() => {
-        if (logado) {
-            // Como a rota /home agora está dentro da pasta (tabs),
-            // o Expo Router a redirecionará trazendo a barra inferior!
-            router.replace('/home');
-        }
-    }, [logado]);
+    const [loading, setLoading] = useState(false);
 
     const entrar = async () => {
         if (!email || !senha) {
@@ -28,28 +23,24 @@ export default function Login() {
         }
 
         try {
-            // 1. Dispara os dados para o endpoint público do Spring Boot
-            const resposta = await api.post('/auth/login', {
-                email: email,
-                senha: senha
-            });
+            setLoading(true);
 
-            // 2. O back retorna o 'DadosTokenJWT' contendo o token string
-            const token = resposta.data.token;
+            // 🚀 CORREÇÃO: Enviando e-mail e senha limpos para o seu AuthContext
+            await signIn(email, senha);
 
-            // 3. Grava o Token real no celular para o seu index.js fazer o Auth Gate
-            await AsyncStorage.setItem('usuario', token);
-
+            // 💡 NOTA: Você não precisa chamar router.replace('/home') aqui!
+            // O componente app/index.js monitora o estado 'signed' e fará o redirecionamento automático!
             Alert.alert('Sucesso', 'Login realizado com sucesso!');
-            setLogado(true); // Seu useEffect vai disparar o router.replace('/home')
-
+            router.replace('/(tabs)/home');
         } catch (error) {
-            // Captura erros de credenciais incorretas ou servidor fora do ar
+            console.error(error);
             if (error.response) {
                 Alert.alert('Erro de Autenticação', 'E-mail ou senha inválidos.');
             } else {
                 Alert.alert('Erro de Conexão', 'Não foi possível conectar ao servidor backend.');
             }
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -72,12 +63,16 @@ export default function Login() {
                     <InputItem
                         label='E-mail'
                         placeholder='Digite seu e-mail'
+                        value={email}
                         onChangeText={setEmail}
+                        autoCapitalize="none"
+                        keyboardType="email-address"
                     />
 
                     <InputItem
                         label='Senha'
                         placeholder='Digite sua senha'
+                        value={senha}
                         onChangeText={setSenha}
                         secureTextEntry={true}
                     />
@@ -90,11 +85,17 @@ export default function Login() {
                         flex
                     />
 
-                    <ButtonDark
-                        title="Entrar"
-                        onPress={entrar}
-                        flex
-                    />
+                    {loading ? (
+                        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                            <ActivityIndicator size="small" color={COLORS.darkBlue} />
+                        </View>
+                    ) : (
+                        <ButtonDark
+                            title="Entrar"
+                            onPress={entrar}
+                            flex
+                        />
+                    )}
                 </View>
 
             </View>
@@ -133,7 +134,7 @@ const styles = StyleSheet.create({
         alignSelf: 'center'
     },
     fieldsWrapper: {
-        marginBottom: 15, 
+        marginBottom: 15,
         width: '100%'
     },
 });
