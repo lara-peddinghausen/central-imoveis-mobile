@@ -161,7 +161,6 @@ export default function CadastrarImovel() {
                     label='Número *'
                     placeholder='Digite o número do imóvel'
                     value={numero}
-                    keyboardType='numeric'
                     onChangeText={(texto) => setNumero(texto)}
                     isRequired
                     error={submitted && !numero.trim()}

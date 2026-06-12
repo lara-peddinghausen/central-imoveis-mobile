@@ -1,4 +1,4 @@
-import { Alert, ScrollView, StyleSheet, View } from "react-native";
+import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
 import { COLORS } from "../src/theme/colors";
 import { FONT_SIZE } from "../src/theme/typography";
 import { api } from '../src/services/api.js';
@@ -17,8 +17,11 @@ export default function CadastroAdministrador() {
     const [senha, setSenha] = useState('');
     const [repetirSenha, setRepetirSenha] = useState('');
 
+    const [submitted, setSubmitted] = useState(false);
+
     // 2. Função assíncrona que dispara os dados para o Spring Boot
     const cadastrar = async () => {
+        setSubmitted(true);
         // Validação de campos em branco
         if (!nome || !email || !dataNascimento || !senha || !repetirSenha) {
             Alert.alert('Campos Obrigatórios', 'Por favor, preencha todos os campos marcados com *.');
@@ -67,53 +70,64 @@ export default function CadastroAdministrador() {
 
     return (
         <ScrollView contentContainerStyle={styles.container}>
-            <View style={styles.areaTitulo}>
-                <View style={styles.linha} />
-                <Text style={styles.titulo}>Cadastro</Text>
-                <View style={styles.linha} />
+            <View style={styles.titleArea}>
+                <View style={styles.line} />
+                <Text style={styles.title}>Cadastro</Text>
+                <View style={styles.line} />
             </View>
 
-            <View style={styles.areaFormulario}>
-                <Text style={styles.subtituloForm}>Preencha seu cadastro</Text>
+            <View style={styles.formArea}>
+                <Text style={styles.subtitleArea}>Preencha seu cadastro</Text>
                 <InputItem
                     label='Nome *'
                     placeholder='Insira seu nome'
                     value={nome}
-                    onChangeText={setNome}
+                    onChangeText={(texto) => setNome(texto)}
+                    isRequired
+                    error = {submitted && !nome.trim()}
                 />
                 <InputItem
                     label='E-mail *'
                     placeholder='Insira seu e-mail'
                     value={email}
-                    onChangeText={setEmail}
+                    onChangeText={(texto) => setEmail(texto)}
                     autoCapitalize="none"
                     keyboardType="email-address"
+                    isRequired
+                    error = {submitted && !email.trim()}
                 />
                 <InputItem
                     label='Data de nascimento*'
                     placeholder='Formato: dd/mm/aaaa'
                     value={dataNascimento}
-                    onChangeText={setDataNascimento}
+                    onChangeText={(texto) => setDataNascimento(texto)}
+                    isRequired
+                    error = {submitted && !dataNascimento.trim()}
                 />
                 <InputItem
                     label='Senha*'
                     placeholder='Insira sua senha'
                     value={senha}
-                    onChangeText={setSenha}
+                    onChangeText={(texto) => setSenha(texto)}
                     secureTextEntry={true}
+                    isRequired
+                    error = {submitted && !senha.trim()}
+                    
                 />
                 <InputItem
                     label='Repetir senha*'
                     placeholder='Insira sua senha novamente'
                     value={repetirSenha}
-                    onChangeText={setRepetirSenha}
+                    onChangeText={(texto) => setRepetirSenha(texto)}
                     secureTextEntry={true}
+                    isRequired
+                    error = {submitted && !repetirSenha.trim()}
                 />
             </View>
 
-            <Text style={styles.textoObrigatorio}>* Campos obrigatórios</Text>
+            <Text style={styles.requiredText}>* Campos obrigatórios</Text>
 
-            <View style={styles.espacamentoBotoes}>
+            <View style={styles.buttonsArea}>
                 <ButtonLight title="Cadastrar"
                     onPress={cadastrar}
                     flex
@@ -140,25 +154,25 @@ const styles = StyleSheet.create({
         gap: 20,
         paddingVertical: 30
     },
-    linha: {
+    line: {
         width: '30%',
         height: 2,
         backgroundColor: COLORS.darkBlue,
         marginHorizontal: 10
     },
-    areaTitulo: {
+    titleArea: {
         flexDirection: 'row',
         alignItems: 'center',
 
     },
-    titulo: {
-        fontSize: FONT_SIZE.medium,
+    title: {
+        fontSize: FONT_SIZE.xlarge,
         fontWeight: 'bold',
         color: COLORS.darkBlue
     },
-    areaFormulario: {
+    formArea: {
         alignItems: 'center',
-        width: '90',
+        width: '90%',
         borderWidth: 1,
         borderColor: COLORS.lightGrey,
         borderRadius: 10,
@@ -166,20 +180,20 @@ const styles = StyleSheet.create({
         gap: 5
 
     },
-    subtituloForm: {
-        fontSize: FONT_SIZE.small,
+    subtitleArea: {
+        fontSize: FONT_SIZE.medium,
         fontWeight: '500',
         color: COLORS.black,
         marginBottom: 10,
     },
-    textoObrigatorio: {
+    requiredText: {
         marginTop: 10,
         alignSelf: 'flex-start',
         marginLeft: 5,
         fontStyle: 'italic',
         color: COLORS.red
     },
-    espacamentoBotoes: {
+    buttonsArea: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         width: '90%',
