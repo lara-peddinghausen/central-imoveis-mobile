@@ -1,11 +1,10 @@
 import { useRouter } from "expo-router";
 import React, { useState, useContext } from 'react';
-import { View, Image, StyleSheet, Alert, ActivityIndicator } from 'react-native';
+import { View, Image, StyleSheet, Alert, ActivityIndicator, Modal, Text } from 'react-native'; // ◄ IMPORTADO MODAL E TEXT
 import { ButtonDark } from "../src/components/ButtonDark";
 import { ButtonLight } from "../src/components/ButtonLight";
 import { COLORS } from '../src/theme/colors';
 import InputItem from "../src/components/InputItem";
-// import AsyncStorage from '@react-native-async-storage/async-storage'; // Importação adicionada!
 import { AuthContext } from "../src/context/AuthContext";
 
 export default function Login() {
@@ -24,19 +23,25 @@ export default function Login() {
 
         try {
             setLoading(true);
-
-            // 🚀 CORREÇÃO: Enviando e-mail e senha limpos para o seu AuthContext
             await signIn(email, senha);
 
-            // 💡 NOTA: Você não precisa chamar router.replace('/home') aqui!
-            // O componente app/index.js monitora o estado 'signed' e fará o redirecionamento automático!
             Alert.alert('Sucesso', 'Login realizado com sucesso!');
             router.replace('/(tabs)/home');
         } catch (error) {
             console.error(error);
+            
+            // 🚀 TRATAMENTO DO ERRO DE CONEXÃO COM O BANCO DE DADOS (STATUS 500):
             if (error.response) {
-                Alert.alert('Erro de Autenticação', 'E-mail ou senha inválidos.');
+                if (error.response.status === 500) {
+                    Alert.alert(
+                        'Erro no Servidor', 
+                        'Não foi possível conectar ao banco de dados. Verifique o status do banco.'
+                    );
+                } else {
+                    Alert.alert('Erro de Autenticação', 'E-mail ou senha inválidos.');
+                }
             } else {
+                // Erro de rede genérico (ex: backend offline ou IP mudou)
                 Alert.alert('Erro de Conexão', 'Não foi possível conectar ao servidor backend.');
             }
         } finally {
@@ -45,11 +50,21 @@ export default function Login() {
     };
 
     const cadastrar = () => {
-        router.push('/cadastroAdministrador');
+        router.push('/cadastrar-administrador');
     }
 
     return (
         <View style={styles.container}>
+
+            {/* 🚀 MODAL DE LOADING EM TELA CHEIA */}
+            <Modal transparent={true} animationType="none" visible={loading}>
+                <View style={styles.loadingContainer}>
+                    <View style={styles.loadingBox}>
+                        <ActivityIndicator size="large" color={COLORS.darkBlue} />
+                        <Text style={styles.loadingText}>Acessando sistema...</Text>
+                    </View>
+                </View>
+            </Modal>
 
             <Image
                 source={require('../src/assets/images/logo1.png')}
@@ -78,24 +93,18 @@ export default function Login() {
                     />
                 </View>
 
+                {/* O botão "Entrar" agora fica visível fixo, sem sumir pelo loading local */}
                 <View style={styles.buttonsArea}>
                     <ButtonLight
                         title="Cadastrar"
                         onPress={cadastrar}
                         flex
                     />
-
-                    {loading ? (
-                        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                            <ActivityIndicator size="small" color={COLORS.darkBlue} />
-                        </View>
-                    ) : (
-                        <ButtonDark
-                            title="Entrar"
-                            onPress={entrar}
-                            flex
-                        />
-                    )}
+                    <ButtonDark
+                        title="Entrar"
+                        onPress={entrar}
+                        flex
+                    />
                 </View>
 
             </View>
@@ -137,4 +146,28 @@ const styles = StyleSheet.create({
         marginBottom: 15,
         width: '100%'
     },
+    // 🚀 NOVOS ESTILOS DO LOADING EM TELA CHEIA:
+    loadingContainer: {
+        flex: 1,
+        backgroundColor: 'rgba(0, 0, 0, 0.4)', // Escurece levemente o fundo da tela
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    loadingBox: {
+        backgroundColor: 'white',
+        padding: 30,
+        borderRadius: 15,
+        alignItems: 'center',
+        gap: 12,
+        elevation: 5,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+    },
+    loadingText: {
+        color: COLORS.darkBlue,
+        fontWeight: 'bold',
+        fontSize: 15,
+    }
 });
