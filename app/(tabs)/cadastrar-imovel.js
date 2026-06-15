@@ -1,18 +1,26 @@
-import { View, Text, StyleSheet, ScrollView, Button, Alert } from 'react-native';
-import { COLORS } from '../../src/theme/colors';
-import InputItem from '../../src/components/InputItem';
+import { View, Text, StyleSheet, ScrollView, Alert } from 'react-native';
+import { COLORS } from '../../src/theme/colors.js';
+import InputItem from '../../src/components/InputItem/index.js';
 import { useState } from 'react';
 import { apiCorreios } from '../../src/services/api.js';
+import { api } from '../../src/services/api.js';
+import { useAuth } from '../../src/context/AuthContext.js';
 import CheckBox from '../../src/components/CheckBox/index.js';
 import { FONT_SIZE } from '../../src/theme/typography.js';
 import { ButtonDark } from '../../src/components/ButtonDark/index.js';
 import { ButtonLight } from '../../src/components/ButtonLight/index.js';
 import ImageSelector from '../../src/components/ImageSelector/index.js';
-
+import { useRouter } from 'expo-router';
 
 export default function CadastrarImovel() {
+    const router = useRouter();
+    const { user } = useAuth();
 
-    const [nomeImovel, setNomeImovel] = useState('');
+    const [submitted, setSubmitted] = useState(false);
+
+    const [salvando, setSalvando] = useState(false);
+
+    const [nome, setNome] = useState('');
     const [cep, setCep] = useState('');
     const [rua, setRua] = useState('');
     const [numero, setNumero] = useState('');
@@ -20,34 +28,22 @@ export default function CadastrarImovel() {
     const [bairro, setBairro] = useState('');
     const [cidade, setCidade] = useState('');
     const [estado, setEstado] = useState('');
+    const [tipoLocacao, setTipoLocacao] = useState('RESIDENCIAL');
+    const [foto, setFoto] = useState(null);
 
-    const [nomeProprietario, setNomeProprietario] = useState('');
-    const [cpfProprietario, setCpfProprietario] = useState('');
-    const [telefoneProprietario, setTelefoneProprietario] = useState('');
-    const [emailProprietario, setEmailProprietario] = useState('');
-
-    const [tipoLocacao, setTipoLocacao] = useState('residencial');
-
-    const [submitted, setSubmitted] = useState(false);
-
-    // A tela de cadastro gerencia o dado bruto que vai para o banco
-    const [imagemImovel, setImagemImovel] = useState(null);
-
-    const handleSalvarImovel = () => {
-        if (!imagemImovel) {
-            Alert.alert("Aviso", "Por favor, adicione uma imagem do imóvel.");
+    const cadastrar = async () => {
+        if (!user || !user.id) {
+            Alert.alert('Erro de Autenticação', 'Usuário não identificado.');
             return;
         }
 
-        // Aqui você faz o seu push/fetch enviando o objeto incluindo o 'imagemImovel'
-        console.log("Pronto para enviar para o servidor. URI da imagem:", imagemImovel);
-    };
+        // 🚀 TRAVA 1: Se já estiver salvando, impede um segundo clique
+        if (salvando) return;
 
-    const cadastrar = () => {
         setSubmitted(true);
 
         const camposObrigatoriosInvalidos =
-            !nomeImovel.trim() ||
+            !nome.trim() ||
             !cep.trim() ||
             !rua.trim() ||
             !numero.trim() ||
@@ -56,52 +52,103 @@ export default function CadastrarImovel() {
             !estado.trim();
 
         if (camposObrigatoriosInvalidos) {
-            Alert.alert('Erro', 'Preencha todos os campos obrigatórios');
+            Alert.alert('Campos Obrigatórios', 'Preencha todos os campos obrigatórios (*)');
             return;
         }
 
-        if (!imagemImovel) {
-            Alert.alert('Aviso', 'Adicione uma imagem do imóvel');
-            return;
-        }
+        try {
+            setSalvando(true); // 🚀 TRAVA 2: Ativa o loading assim que passa na validação
 
-        console.log('enviar formulário');
-    };
+            const formData = new FormData();
 
-    async function buscarCepAutomatico(cepDigitado) {
-        const cepLimpo = cepDigitado.replace(/\D/g, '');
+            // 1. Injetando textos do imóvel mapeados no Spring Boot
+            formData.append('nome', nome);
+            formData.append('rua', rua);
+            formData.append('cep', cep.replace(/\D/g, ''));
+            formData.append('numero', numero);
+            formData.append('complemento', complemento);
+            formData.append('bairro', bairro);
+            formData.append('cidade', cidade);
+            formData.append('estado', estado);
+            formData.append('tipoLocacao', tipoLocacao);
+            formData.append('status', 'DISPONIVEL');
+            formData.append('administrador', user.id);
 
-        if (cepLimpo.length === 8) {
-            try {
-                const response = await apiCorreios.get(`/${cepLimpo}/json`);
+            // 🚀 O CORTE: Removeu a propriedade fantasma do proprietário daqui. 
+            // Como ela não é enviada, o Spring Boot a interpretará como null com segurança.
 
-                if (response.data.erro === true || response.data.erro === 'true') {
-                    alert('Este CEP não foi encontrado. Por favor, verifique os números.');
-                    limparCamposEndereco();
-                    return;
-                }
+            // 2. Injetando o arquivo físico da imagem
+            if (foto) {
+                const uriParts = foto.split('.');
+                const fileType = uriParts[uriParts.length - 1];
 
-                // Preenche os campos retornados pela API
-                setRua(response.data.logradouro || '');
-                setBairro(response.data.bairro || '');
-                setCidade(response.data.localidade || '');
-                setEstado(response.data.uf || '');
-
-            } catch (error) {
-                console.error("DEBUG CEP:", error.message);
-
-                if (error.response) {
-                    alert('Erro ao validar o CEP. Verifique o formato digitado.');
-                } else if (error.request) {
-                    alert('Não foi possível conectar ao serviço de CEP. Verifique sua conexão com a internet.');
-                } else {
-                    alert('Ocorreu um erro inesperado ao buscar o CEP.');
-                }
-
-                limparCamposEndereco();
+                formData.append('foto', {
+                    uri: foto,
+                    name: `imovel_${Date.now()}.${fileType}`,
+                    type: `image/${fileType}`
+                });
             }
+
+            const resposta = await api.post('/imovel', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+
+            if (resposta.status === 201 || resposta.status === 200) {
+                // Pega o ID numérico do imóvel que o Spring Boot acabou de salvar
+                const imovelCriadoId = resposta.data?.id;
+
+                Alert.alert(
+                    'Sucesso!',
+                    'Imóvel cadastrado com sucesso! Deseja vincular um proprietário a ele agora?',
+                    [
+                        {
+                            text: 'Não',
+                            onPress: () => router.replace('/home'),
+                            style: 'cancel' // Deixa o botão com um aspecto secundário discreto
+                        },
+                        {
+                            text: 'Sim, cadastrar propriétário',
+                            // Passa o id do imóvel adiante via parâmetro
+                            onPress: () => router.replace(`/proprietario/cadastrar-proprietario?imovelId=${imovelCriadoId}`),
+                            style: 'default'
+                        }
+                    ],
+                    { cancelable: false } // Impede o usuário de fechar o alerta clicando fora dele, obrigando a escolher uma opção
+                );
+            }
+
+        } catch (error) {
+            console.error("Erro requisição cadastro:", error);
+            Alert.alert('Erro no Cadastro', 'O backend rejeitou os dados.');
+        } finally {
+            setSalvando(false); // 🚀 LIBERAÇÃO: Desativa o loading caso dê erro para o usuário tentar de novo
         }
     }
+
+
+async function buscarCepAutomatico(cepDigitado) {
+    const cepLimpo = cepDigitado.replace(/\D/g, '');
+    if (cepLimpo.length === 8) {
+        try {
+            const response = await apiCorreios.get(`/${cepLimpo}/json`);
+            if (response.data.erro === true || response.data.erro === 'true') {
+                alert('Este CEP não foi encontrado. Por favor, verifique os números.');
+                limparCamposEndereco();
+                return;
+            }
+            setRua(response.data.logradouro || '');
+            setBairro(response.data.bairro || '');
+            setCidade(response.data.localidade || '');
+            setEstado(response.data.uf || '');
+        } catch (error) {
+            console.error("DEBUG CEP:", error.message);
+            limparCamposEndereco();
+        }
+    }
+}
+
 
     function limparCamposEndereco() {
         setRua('');
@@ -115,7 +162,6 @@ export default function CadastrarImovel() {
             contentContainerStyle={styles.container}
             showsVerticalScrollIndicator={false}
         >
-
             <View style={styles.titleArea} >
                 <View style={styles.line} />
                 <Text style={styles.title}>Cadastrar Imóvel</Text>
@@ -128,12 +174,11 @@ export default function CadastrarImovel() {
                 <InputItem
                     label='Nome do Imóvel *'
                     placeholder='Ex: Apartamento no Centro'
-                    value={nomeImovel}
-                    onChangeText={(texto) => setNomeImovel(texto)}
+                    value={nome}
+                    onChangeText={(texto) => setNome(texto)}
                     isRequired
-                    error={submitted && !nomeImovel.trim()}
+                    error={submitted && !nome.trim()}
                 />
-
                 <InputItem
                     label='CEP *'
                     placeholder='Digite o CEP do imóvel'
@@ -147,7 +192,6 @@ export default function CadastrarImovel() {
                     isRequired
                     error={submitted && !cep.trim()}
                 />
-
                 <InputItem
                     label='Rua *'
                     placeholder='Nome da rua ou avenida'
@@ -156,7 +200,6 @@ export default function CadastrarImovel() {
                     isRequired
                     error={submitted && !rua.trim()}
                 />
-
                 <InputItem
                     label='Número *'
                     placeholder='Digite o número do imóvel'
@@ -165,14 +208,12 @@ export default function CadastrarImovel() {
                     isRequired
                     error={submitted && !numero.trim()}
                 />
-
                 <InputItem
                     label='Complemento'
                     placeholder='Apto, Bloco, Sala, etc. (Opcional)'
                     value={complemento}
                     onChangeText={(texto) => setComplemento(texto)}
                 />
-
                 <InputItem
                     label='Bairro *'
                     placeholder='Nome do bairro'
@@ -180,9 +221,7 @@ export default function CadastrarImovel() {
                     onChangeText={(texto) => setBairro(texto)}
                     isRequired
                     error={submitted && !bairro.trim()}
-
                 />
-
                 <InputItem
                     label='Cidade *'
                     placeholder='Cidade do imóvel'
@@ -191,7 +230,6 @@ export default function CadastrarImovel() {
                     isRequired
                     error={submitted && !cidade.trim()}
                 />
-
                 <InputItem
                     label='Estado *'
                     placeholder='UF (Ex: SP, RJ, SC)'
@@ -204,53 +242,23 @@ export default function CadastrarImovel() {
 
                 <View style={styles.fieldContainer}>
                     <Text style={styles.text}>Tipo de locação: *</Text>
-
                     <View style={styles.checkBoxArea}>
                         <CheckBox
                             label="Residencial"
-                            isSelected={tipoLocacao === 'residencial'}
-                            onPress={() => setTipoLocacao('residencial')}
+                            isSelected={tipoLocacao === 'RESIDENCIAL'}
+                            onPress={() => setTipoLocacao('RESIDENCIAL')}
                         />
                         <CheckBox
                             label="Temporada"
-                            isSelected={tipoLocacao === 'temporada'}
-                            onPress={() => setTipoLocacao('temporada')}
+                            isSelected={tipoLocacao === 'TEMPORADA'}
+                            onPress={() => setTipoLocacao('TEMPORADA')}
                         />
                     </View>
                 </View>
 
-                <ImageSelector onImageSelected={(uri) => setImagemImovel(uri)} />
-
-            </View>
-
-
-            <View style={styles.formArea}>
-                <Text style={styles.formTitle}> Preencha os dados do proprietário </Text>
-                <Text>(Opcional)</Text>
-                <InputItem
-                    label='Nome'
-                    placeholder='Digite o nome do proprietário'
-                    value={nomeProprietario}
-                    onChangeText={(texto) => setNomeProprietario(texto)}
-                />
-                <InputItem
-                    label='CPF'
-                    placeholder='Apenas números, sem pontos ou traços'
-                    value={cpfProprietario}
-                    onChangeText={(texto) => setCpfProprietario(texto)}
-                />
-                <InputItem
-                    label='Telefone'
-                    placeholder='(xx) xxxxx-xxxx'
-                    value={telefoneProprietario}
-                    onChangeText={(texto) => setTelefoneProprietario(texto)}
-                />
-                <InputItem
-                    label='E-mail'
-                    placeholder='email@email.com'
-                    value={emailProprietario}
-                    onChangeText={(texto) => setEmailProprietario(texto)}
-                />
+                <View style={styles.imageArea}>
+                    <ImageSelector onImageSelected={(uri) => setFoto(uri)} />
+                </View>
             </View>
 
             <View style={styles.alertArea}>
@@ -258,22 +266,13 @@ export default function CadastrarImovel() {
             </View>
 
             <View style={styles.buttonArea}>
-                <ButtonDark
-                    title="Cadastrar"
-                    onPress={cadastrar}
-                    flex
-                />
-                <ButtonLight
-                    title="Cancelar"
-                    // onPress={cancelar}
-                    flex
-                />
+                <ButtonDark title={salvando ? 'Salvando Imóvel...' : 'Cadastrar Imóvel'} onPress={cadastrar} disabled={salvando} flex />
+                <ButtonLight title="Cancelar" onPress={() => router.replace('/home')} flex />
             </View>
-
-
         </ScrollView >
     );
 }
+
 
 const styles = StyleSheet.create({
     container: {
@@ -292,10 +291,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     line: {
-        width: '30%',
+        width: '25%',
         height: 2,
         backgroundColor: COLORS.darkBlue,
-        marginHorizontal: 20,
+        marginHorizontal: 15,
     },
     title: {
         fontSize: FONT_SIZE.xlarge,
@@ -321,22 +320,20 @@ const styles = StyleSheet.create({
         alignSelf: 'flex-start',
         marginVertical: 10,
         marginLeft: 15
-
     },
     text: {
         fontSize: FONT_SIZE.small,
         marginBottom: 10,
         color: COLORS.black,
-
     },
     checkBoxArea: {
         flexDirection: 'row',
-
     },
     imageArea: {
-        padding: 20,
-        backgroundColor: COLORS.white,
-        alignItems: 'flex-start'
+        width: '100%',
+        paddingHorizontal: 20,
+        marginTop: 10,
+        alignItems: 'center'
     },
     alertArea: {
         alignSelf: 'flex-start',
@@ -345,7 +342,6 @@ const styles = StyleSheet.create({
     alertText: {
         fontStyle: 'italic',
         color: COLORS.red,
-        textAlign: 'left'
     },
     buttonArea: {
         flexDirection: 'row'
