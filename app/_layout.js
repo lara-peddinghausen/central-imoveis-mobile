@@ -7,7 +7,7 @@ export default function Layout() {
             <Stack screenOptions={{ headerShown: false }}>
                 <Stack.Screen name="index" />
                 <Stack.Screen name="login" />
-                <Stack.Screen name="cadastroAdministrador" />
+                <Stack.Screen name="cadastrar-administrador" />
                 <Stack.Screen name="(tabs)" />
             </Stack>
         </AuthProvider>
