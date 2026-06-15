@@ -11,6 +11,8 @@ export default function InputItem({
     onChangeText,
     secureTextEntry = false,
     error = false,
+    editable = true,
+    ...rest // Captura qualquer outra propriedade extra
 }) {
 
     const [mostrarSenha, setMostrarSenha] = useState(false);
@@ -21,16 +23,18 @@ export default function InputItem({
             <Text style={styles.text}> {label} </Text>
 
 
-            <View style={[styles.container, error && styles.containerError]}>
+            <View style={[styles.container, error && styles.containerError, !editable && styles.containerDisabled]}>
 
                 <TextInput
-                    style={styles.input}
+                    style={[styles.input, !editable && styles.inputDisabled]}
                     placeholder={placeholder}
                     value={value}
                     onChangeText={onChangeText}
                     secureTextEntry={
                         secureTextEntry && !mostrarSenha
                     }
+                    editable={editable}
+                    {...rest}
                 />
 
                 {secureTextEntry && (
@@ -58,7 +62,7 @@ export default function InputItem({
 const styles = StyleSheet.create({
     wrapper: {
         marginBottom: 10,
-        width: '100%',
+        width: '90%',
         // alignItems: 'center'
     },
     text: {
@@ -84,6 +88,10 @@ const styles = StyleSheet.create({
         borderColor: COLORS.red,
         borderWidth: 2
     },
+    containerDisabled: {
+        borderColor: '#E0E0E0',
+        backgroundColor: '#F9F9F9' 
+    },
     input: {
         // width: 250,
         height: '100%',
@@ -93,5 +101,9 @@ const styles = StyleSheet.create({
         // margin: 10,
         fontSize: FONT_SIZE.small,
         paddingRight: 10,
+        color: COLORS.black,
     },
+    inputDisabled: {
+        color: '#7A7A7A' 
+    }
 })
