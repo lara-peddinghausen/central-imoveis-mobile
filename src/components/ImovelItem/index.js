@@ -3,51 +3,62 @@ import { IconAlugado, IconDisponivel } from "../Icons";
 import { COLORS } from "../../theme/colors";
 import { IMAGES } from '../../assets/images';
 import { ButtonDark } from "../ButtonDark";
+import { useRouter } from 'expo-router';
 
-export default function ImovelItem({
-    status,
-    titulo,
-    endereco,
-    tipo
-}) {
+export default function ImovelItem({ imovel }) {
+    const router = useRouter();
 
-    const corStatus =
-        status === 'Alugado'
-            ? COLORS.yellowCDI
-            : COLORS.green;
+    if (!imovel) return null;
 
-    const iconStatus =
-        status === 'Alugado'
-            ? <IconAlugado color={COLORS.darkBlue} />
-            : <IconDisponivel color={COLORS.darkBlue} />;
+    const BASE_URL = 'http://10.0.2.2:8080';
+
+    const isAlugado = imovel.status === 'ALUGADO';
+    const textoStatus = isAlugado ? 'Alugado' : 'Disponível';
+
+    const imagemSource = imovel.fotoUrl
+        ? { uri: `${BASE_URL}${imovel.fotoUrl}` }
+        : IMAGES.apartamentoX;
+
+    const corStatus = isAlugado
+        ? COLORS.yellowCDI
+        : COLORS.green;
+
+    const iconStatus = isAlugado
+        ? <IconAlugado color={COLORS.darkBlue} />
+        : <IconDisponivel color={COLORS.darkBlue} />;
+
+    const handleDetalhes = () => {
+        router.push(`/imovel/${imovel.id}`);
+    };
 
     return (
-        <View style={styles.cardImovel}>
+        <View style={styles.cardImovel} >
             <View style={[
                 styles.areaTituloCardImovel,
                 { backgroundColor: corStatus }
             ]}>
                 {iconStatus}
-                <Text style={styles.tituloCardImovel}>{status}</Text>
+                <Text style={styles.tituloCardImovel}>{textoStatus}</Text>
             </View>
             <View style={styles.areaConteudoCard}>
                 <Image
                     style={styles.img}
-                    source={IMAGES.apartamentoX}
+                    source={imagemSource}
+                    resizeMode="cover"
                 />
                 <View style={styles.areaTextoCard}>
-                    <Text style={styles.tituloImovel}>{titulo}</Text>
-                    <Text style={styles.enderecoImovel}>{endereco}</Text>
-                    <Text style={styles.tipoImovel}>{tipo}</Text>
+                    <Text style={styles.tituloImovel}>{imovel.nome}</Text>
+                    <Text style={styles.enderecoImovel}>{imovel.rua}, {imovel.numero}</Text>
+                    <Text style={styles.tipoImovel}>{imovel.tipoLocacao}</Text>
                 </View>
             </View>
 
             <ButtonDark
                 title="Ver detalhes"
-            // onPress={() => navigation.navigate('/cadastroImovel')} 
+                onPress={handleDetalhes}
             />
 
-        </View>
+        </View >
     );
 }
 
