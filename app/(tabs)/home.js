@@ -1,77 +1,114 @@
-import { Picker } from '@react-native-picker/picker';
 import { useNavigation } from 'expo-router';
-import React, { useEffect, useState, useContext } from 'react'; // 🚀 Adicionado o useContext
+import React, { useState, useContext, useCallback, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, ScrollView, ActivityIndicator } from 'react-native';
 import { IconAlugado, IconDisponivel } from '../../src/components/Icons';
 import ImovelItem from '../../src/components/ImovelItem';
 import { COLORS } from '../../src/theme/colors';
 import { Dropdown } from 'react-native-element-dropdown';
-import { AuthContext } from '../../src/context/AuthContext'; // 🚀 Ajuste o caminho para onde está seu AuthContext
-import {api} from '../../src/services/api'; // 🚀 Import do Axios configurado
+import { AuthContext } from '../../src/context/AuthContext'; // Garantido o uso correto
+import { api } from '../../src/services/api';
+import { useFocusEffect } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const properties = [
-    { status: 'Alugado', titulo: 'Apartamento X', endereco: 'Rua da Matriz, 21', tipo: 'Residencial' },
-    { status: 'Disponível', titulo: 'Apartamento Y', endereco: 'Avenida Brasil, 100', tipo: 'Comercial' },
-    { status: 'Disponível', titulo: 'Casa Z', endereco: 'Travessa da Paz, 5', tipo: 'Residencial' },
-];
 
 export default function Home() {
 
     const navigation = useNavigation();
-    const { signOut } = useContext(AuthContext); // Permite deslogar se precisar futuramente
-    
-    // 🚀 Estados para controlar o perfil dinâmico vindo do Spring Boot
-    const [nomeUsuario, setNomeUsuario] = useState(''); // 'Lara' fica como padrão inicial
+    // Pegando o user de dentro do AuthContext
+    const { user, signOut } = useContext(AuthContext);
+
+    // Estados para controlar o perfil dinâmico vindo do Spring Boot
+    const [nomeUsuario, setNomeUsuario] = useState('');
     const [carregandoPerfil, setCarregandoPerfil] = useState(true);
-    
+
     const [imovel, setImovel] = useState('Todos');
-    const [filteredProperties, setFilteredProperties] = useState(properties);
+
+    // Começa com a lista de imóveis vazia para preencher com o banco de dados
+    const [properties, setProperties] = useState([]);
+    const [filteredProperties, setFilteredProperties] = useState([]);
 
     const dadosDropdown = [
         { label: 'Todos', value: 'Todos' },
-        { label: 'Alugado', value: 'Alugado' },
-        { label: 'Disponível', value: 'Disponível' },
+        { label: 'Alugado', value: 'ALUGADO' },
+        { label: 'Disponível', value: 'DISPONIVEL' }
     ];
 
-    // 🚀 ADIÇÃO: Carrega o nome real do administrador direto da sua nova rota de Perfil do Backend
-    useEffect(() => {
-        async function buscarPerfilBackend() {
-            try {
-                const response = await api.get('/administrador/perfil');
-                if (response.data && response.data.nome) {
-                    // Divide o nome para pegar apenas o primeiro nome (Ex: "Lara Peddinghausen" vira "Lara")
-                    const primeiroNome = response.data.nome.split(' ')[0];
-                    setNomeUsuario(primeiroNome);
+    // Busca o perfil do usuário e os imóveis do banco
+    useFocusEffect(
+        useCallback(() => {
+            async function carregarDadosIniciais() {
+                try {
+                     // Recupera o token salvo direto do celular antes de fazer a busca
+                const tokenSalvo = await AsyncStorage.getItem('@centralImoveis:token');
+                
+                // Se o token existir, garante que ele está nos cabeçalhos da API para evitar o 403
+                if (tokenSalvo) {
+                    api.defaults.headers.common['Authorization'] = `Bearer ${tokenSalvo}`;
                 }
-            } catch (error) {
-                console.log("Mantendo nome padrão. Motivo:", error.message);
-            } finally {
-                setCarregandoPerfil(false);
-            }
-        }
-        buscarPerfilBackend();
-    }, []);
 
-    // Atualiza o título do cabeçalho assim que o nome chegar do banco de dados
+                    // Busca o perfil do administrador
+                    const perfilResponse = await api.get('/administrador/perfil');
+                    if (perfilResponse.data && perfilResponse.data.nome) {
+                        const primeiroNome = perfilResponse.data.nome.split(' ')[0];
+                        setNomeUsuario(primeiroNome);
+                    }
+
+                    // Passa o ID do administrador logado na URL se ele existir
+                    let urlImoveis = '/imovel';
+                    if (user && user.id) {
+                        urlImoveis = `/imovel?administradorId=${user.id}`;
+                    }
+
+                    // Busca os imóveis atualizados do backend
+                    const imoveisResponse = await api.get(urlImoveis);
+
+                    if (imoveisResponse.data && imoveisResponse.data.content) {
+                        setProperties(imoveisResponse.data.content);
+                        setFilteredProperties(imoveisResponse.data.content);
+                    }
+
+                } catch (error) {
+                    console.log("Erro ao carregar dados do backend:", error.message);
+
+                                    
+                // Adicione este log detalhado para vermos no terminal o motivo exato do 403
+                if (error.response) {
+                    console.log("Status do Erro:", error.response.status);
+                    console.log("Detalhes do Erro do Spring:", error.response.data);
+                }
+                } finally {
+                    setCarregandoPerfil(false);
+                }
+            }
+
+            carregarDadosIniciais();
+
+            // Retorno limpo obrigatório do useCallback
+            return () => { };
+        }, [user])
+    );
+
+    // Atualiza o título do cabeçalho
     useEffect(() => {
         navigation.setOptions({
-            title: `Olá, ${nomeUsuario}!`
+            title: `Olá, ${nomeUsuario || 'Usuário'}!`
         });
     }, [navigation, nomeUsuario]);
 
+    // Filtro do dropdown
     useEffect(() => {
         if (imovel === 'Todos') {
             setFilteredProperties(properties);
         } else {
             setFilteredProperties(properties.filter(p => p.status === imovel));
         }
-    }, [imovel]);
+    }, [imovel, properties]);
 
+    // Contadores dinâmicos baseados nos dados do banco
     const totalImoveis = properties.length;
-    const imoveisAlugados = properties.filter(p => p.status === 'Alugado').length;
-    const imoveisDisponiveis = properties.filter(p => p.status === 'Disponível').length;
+    const imoveisAlugados = properties.filter(p => p.status === 'ALUGADO' || p.status === 'Alugado').length;
+    const imoveisDisponiveis = properties.filter(p => p.status === 'DISPONIVEL' || p.status === 'Disponível').length;
 
-    // Enquanto busca o perfil na API, exibe um loading discreto sem quebrar o layout
     if (carregandoPerfil) {
         return (
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.white }}>
@@ -81,12 +118,10 @@ export default function Home() {
     }
 
     return (
-
         <ScrollView
             contentContainerStyle={styles.container}
             showsVerticalScrollIndicator={false}
         >
-
             <Image
                 source={require('../../src/assets/images/logo4.png')}
                 style={styles.textoLogo}
@@ -101,25 +136,19 @@ export default function Home() {
                 />
                 <View style={{ gap: 10 }}>
                     <View style={styles.areaTextoNumeros}>
-                        <Text style={styles.textoNumeros}>
-                            Total de Imóveis
-                        </Text>
+                        <Text style={styles.textoNumeros}>Total de Imóveis</Text>
                         <Text style={styles.textoNumeros}>{totalImoveis}</Text>
                     </View>
 
                     <View style={styles.areaTextoNumeros}>
                         <IconAlugado />
-                        <Text style={styles.textoNumeros}>
-                            Alugados
-                        </Text>
+                        <Text style={styles.textoNumeros}>Alugados</Text>
                         <Text style={styles.textoNumeros}>{imoveisAlugados}</Text>
                     </View>
 
                     <View style={styles.areaTextoNumeros}>
                         <IconDisponivel />
-                        <Text style={styles.textoNumeros}>
-                            Disponíveis
-                        </Text>
+                        <Text style={styles.textoNumeros}>Disponíveis</Text>
                         <Text style={styles.textoNumeros}>{imoveisDisponiveis}</Text>
                     </View>
                 </View>
@@ -145,21 +174,20 @@ export default function Home() {
                 }}
             />
 
-            {filteredProperties.map((item, index) => (
-                <ImovelItem
-                    key={index}
-                    status={item.status}
-                    titulo={item.titulo}
-                    endereco={item.endereco}
-                    tipo={item.tipo}
-                />
-            ))}
-
+            {filteredProperties.length === 0 ? (
+                <Text style={styles.emptyText}>Nenhum imóvel encontrado.</Text>
+            ) : (
+                filteredProperties.map((item, index) => (
+                    <ImovelItem
+                        key={item.id || index}
+                        imovel={item}
+                    />
+                ))
+            )}
         </ScrollView >
-    )
+    );
 }
 
-// ── ESTILOS MANTIDOS 100% INTACTOS ───────────────────────────────────────
 const styles = StyleSheet.create({
     container: {
         flexGrow: 1,
@@ -250,4 +278,11 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: COLORS.black,
     },
+    emptyText: {
+        fontSize: 16,
+        color: COLORS.grey,
+        fontStyle: 'italic',
+        textAlign: 'center',
+        marginTop: 20,
+    }
 });
