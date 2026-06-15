@@ -1,37 +1,42 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// ─── URL base da API ───────────────────────────────────────────
-// Emulador Android → 10.0.2.2  |  Dispositivo físico → IP local
-const API_URL = 'http://10.0.2.2:8080/api';
+// ─── URL BASE UNIFICADA ────────────────────────────────────────
+// Ajustada para apontar corretamente para a raiz do seu Spring Boot
+const API_URL = 'http://10.0.2.2:8080';
 
-// Chaves usadas no AsyncStorage
-const TOKEN_KEY = '@jwt_token';
-const EMAIL_KEY = '@user_email';
+// 🚀 CHAVES PADRONIZADAS (Alinhadas perfeitamente com o seu AuthContext)
+const TOKEN_KEY = '@centralImoveis:token';
+const USER_KEY = '@centralImoveis:user';
 
+// ─── INSTÂNCIA PADRÃO DO AXIOS ──────────────────────────────────
+// Esta é a instância que você importa em Home.js e AuthContext.js
+export const api = axios.create({
+    baseURL: API_URL,
+    headers: {
+        'Content-Type': 'application/json',
+    }
+});
 
-// ─── LOGIN ─────────────────────────────────────────────────────
-// Envia credenciais, recebe JWT e salva no dispositivo
+// ─── LOGIN LEGACY (Mantido por compatibilidade) ─────────────────
 export async function login(email, senha) {
-    const response = await axios.post(`${API_URL}/auth/login`, {
-        email,
-        senha,
-    });
+    const response = await api.post('/auth/login', { email, senha });
+    const { token, role, id, nome, cpf, dataNascimento } = response.data;
 
-    const { token } = response.data;
+    const usuarioLogado = { id, email, role, nome, cpf, dataNascimento };
 
-    // Salva token e email para uso futuro (persiste entre sessões)
     await AsyncStorage.setItem(TOKEN_KEY, token);
-    await AsyncStorage.setItem(EMAIL_KEY, email);
+    await AsyncStorage.setItem(USER_KEY, JSON.stringify(usuarioLogado));
+
+    // Injeta na instância global
+    api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
     return response.data;
 }
 
-
 // ─── CADASTRO ──────────────────────────────────────────────────
-// Cria novo usuário no backend (rota pública)
 export async function cadastrarAdministrador(nome, email, dataNascimento, senha) {
-    const response = await axios.post(`${API_URL}/auth/cadastro`, {
+    const response = await api.post('/auth/cadastro', {
         nome,
         email,
         dataNascimento, 
@@ -40,39 +45,25 @@ export async function cadastrarAdministrador(nome, email, dataNascimento, senha)
     return response.data;
 }
 
-
-// ─── LOGOUT ────────────────────────────────────────────────────
-// Remove dados locais (JWT é stateless — não há sessão no servidor)
+// ─── LOGOUT LEGACY ─────────────────────────────────────────────
 export async function logout() {
     await AsyncStorage.removeItem(TOKEN_KEY);
-    await AsyncStorage.removeItem(EMAIL_KEY);
+    await AsyncStorage.removeItem(USER_KEY);
+    delete api.defaults.headers.common['Authorization'];
 }
 
-
-// ─── LER TOKEN ─────────────────────────────────────────────────
-// Retorna o token salvo ou null se não houver
+// ─── LER TOKEN (Corrigido para pegar a chave certa!) ───────────
 export async function getToken() {
     return AsyncStorage.getItem(TOKEN_KEY);
 }
 
-
-// ─── LER EMAIL ─────────────────────────────────────────────────
-export async function getEmail() {
-    return AsyncStorage.getItem(EMAIL_KEY);
-}
-
-
 // ─── INSTÂNCIA AXIOS AUTENTICADA ───────────────────────────────
-// Cria um cliente Axios com o header Authorization já configurado.
-// Use esta função em TODAS as chamadas a rotas protegidas.
 export async function apiAutenticada() {
     const token = await getToken();
+    
+    if (token) {
+        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    }
 
-    return axios.create({
-        baseURL: API_URL,
-        headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-        },
-    });
+    return api;
 }

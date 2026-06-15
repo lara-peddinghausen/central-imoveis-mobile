@@ -1,16 +1,25 @@
 import React, { createContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { api } from '../services/api'; // Certifique-se de que o caminho do seu axios está certo
+import { api } from '../services/api';
+import { useContext } from 'react';
 
 export const AuthContext = createContext({});
+
+export function useAuth() {
+  const context = useContext(AuthContext);
+  return context;
+}
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // 🚀 ADIÇÃO 2: Verifica se já existe um token salvo assim que o app abre
+  //Verifica se já existe um token salvo assim que o app abre
   useEffect(() => {
     async function loadStorageData() {
+
+      // await AsyncStorage.clear();
+
       const storageToken = await AsyncStorage.getItem('@centralImoveis:token');
       const storageUser = await AsyncStorage.getItem('@centralImoveis:user');
 
@@ -24,16 +33,18 @@ export function AuthProvider({ children }) {
     loadStorageData();
   }, []);
 
-  // 🚀 ADIÇÃO 1: Função de Login que recebe o e-mail e senha do formulário
+  // Função de Login que recebe o e-mail e senha do formulário
   async function signIn(email, senha) {
     try {
-      // Bate exatamente no seu AuthController do Spring Boot
       const response = await api.post('/auth/login', { email, senha });
-      
-      // Captura o token, e-mail e role vindo do seu AuthResponse (Record)
-      const { token, role } = response.data;
 
-      const usuarioLogado = { email, role };
+      console.log("👉 O QUE O JAVA ESTÁ DEVOLVENDO NO LOGIN:", response.data);
+
+      // 🚀 1. CAPTURA ATUALIZADA: Pegando todos os novos campos que o Java enviou
+      const { token, role, id, nome, cpf, dataNascimento, email: emailDoBanco } = response.data;
+
+      // 🚀 2. OBJETO ATUALIZADO: Incluindo os novos campos para a tela de Perfil ler
+      const usuarioLogado = { id, email: emailDoBanco || email, role, nome, cpf, dataNascimento };
       setUser(usuarioLogado);
 
       // Injeta o token no cabeçalho do Axios para todas as próximas requisições
@@ -45,7 +56,7 @@ export function AuthProvider({ children }) {
 
     } catch (error) {
       console.error("Erro ao realizar login:", error.response?.data || error.message);
-      throw error; // Repassa o erro para a sua tela de Login exibir o alerta na tela
+      throw error;
     }
   }
 
