@@ -104,6 +104,23 @@ export default function TabsLayout() {
                     headerShown: false
                 }}
             />
+            <Tabs.Screen
+                name="imovel/editar-imovel"
+                options={{
+                    href: null,
+                    headerShown: false
+                }}
+            />
+            <Tabs.Screen
+                name="proprietario/editar-proprietario"
+                options={{
+                    href: null,
+                    headerShown: false
+                }}
+            />
+
+
+
         </Tabs>
     );
 }
