@@ -3,6 +3,10 @@ import { View, Text, StyleSheet, Image, ScrollView, ActivityIndicator, Alert } f
 import { useLocalSearchParams } from 'expo-router';
 import { api } from '../../../src/services/api'; // ajuste seu caminho de import
 import { COLORS } from '../../../src/theme/colors';
+import { IconAlugado, IconDisponivel } from '../../../src/components/Icons';
+import { FONT_SIZE } from '../../../src/theme/typography';
+import DataItem from '../../../src/components/DataItem';
+
 
 export default function DetalhesImovel() {
     // 🚀 Captura o ID vindo da URL
@@ -56,34 +60,34 @@ export default function DetalhesImovel() {
         <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
             <View style={styles.line} />
             <View style={styles.header}>
-
                 <Image
                     source={imovel.fotoUrl ? { uri: `${BASE_URL}${imovel.fotoUrl}` } : require('../../../src/assets/images/logo3.png')}
                     style={styles.img}
                 />
                 <View style={styles.textHeader}>
                     <Text style={styles.tituloImovel}>{imovel.nome}</Text>
-                    <Text style={styles.subtitulo}>{imovel.tipoLocacao}</Text>
+                    <Text style={styles.subtitulo}>{imovel.tipoLocacao ? imovel.tipoLocacao.toLowerCase() : ''}</Text>
                 </View>
             </View>
             <View style={styles.line} />
 
-            <View style={[styles.statusBanner, { backgroundColor: imovel.status === 'ALUGADO' ? '#F2C94C' : '#27AE60' }]}>
-                <Text style={styles.statusText}>
-                    {imovel.status === 'ALUGADO' ? '🏠 Alugado' : '🏠 Disponível'}
+            <View style={[styles.statusBanner, { backgroundColor: imovel.status === 'ALUGADO' ? COLORS.yellowCDI : COLORS.green }]}>
+                <Text>
+                    {imovel.status === 'ALUGADO' ?
+                        (<View style={styles.areaStatus}>
+                            <IconAlugado color={COLORS.darkBlue} />
+                            <Text style={styles.statusText}>Alugado</Text>
+                        </View>) :
+                        (<View style={styles.areaStatus}>
+                            <IconDisponivel color={COLORS.darkBlue} />
+                            <Text style={styles.statusText}>Disponível</Text>
+                        </View>)}
                 </Text>
             </View>
 
-            <View style={styles.cardDados}>
-                <Text style={styles.cardTitle}>Dados</Text>
-                <Text style={styles.infoText}><Text style={styles.bold}>Rua:</Text> {imovel.rua}, {imovel.numero}</Text>
-                {imovel.complemento ? <Text style={styles.infoText}><Text style={styles.bold}>Complemento:</Text> {imovel.complemento}</Text> : null}
-                <Text style={styles.infoText}><Text style={styles.bold}>Bairro:</Text> {imovel.bairro}</Text>
-                <Text style={styles.infoText}><Text style={styles.bold}>CEP:</Text> {imovel.cep}</Text>
-                <Text style={styles.infoText}><Text style={styles.bold}>Cidade/Estado:</Text> {imovel.cidade} - {imovel.estado}</Text>
-            </View>
+            
 
-            {/* Seus próximos blocos de Contrato e Financeiro entram aqui abaixo */}
+            <DataItem imovel={imovel} />
         </ScrollView>
     );
 }
@@ -94,7 +98,6 @@ const styles = StyleSheet.create({
         backgroundColor: COLORS.white,
         justifyContent: 'flex-start',
         alignItems: 'center',
-        paddingHorizontal: 10,
         gap: 20,
         paddingTop: 80,
     },
@@ -111,57 +114,51 @@ const styles = StyleSheet.create({
     },
     header: {
         flexDirection: 'row',
-        alignItems: 'center',
-        gap: 40
+        alignItems: 'center',       // Centraliza os elementos na vertical (alinhados pelo meio da foto)
+        justifyContent: 'center',
+        width: '100%',
+        paddingHorizontal: 20,
     },
     img: {
-        width: '40%',
-        height: 100,
+        width: '50%',                   // 🚀 LARGURA FIXA: A imagem mantém um tamanho elegante fixo
+        height: 120,
         borderRadius: 10,
         resizeMode: 'cover'
     },
+
+    textHeader: {
+        flex: 1,                      // Ocupa todo o resto da tela de forma dinâmica
+        justifyContent: 'center',     // Centraliza o bloco de textos na vertical
+        alignItems: 'center',         // Centraliza o título em relação ao subtítulo
+        paddingLeft: 10,
+
+    },
     tituloImovel: {
-        fontSize: 22,
+        fontSize: FONT_SIZE.xlarge,
         fontWeight: 'bold',
         color: COLORS.black,
-        marginTop: 10
+        textAlign: 'center',
+        width: '100%',
     },
     subtitulo: {
-        fontSize: 16,
+        fontSize: FONT_SIZE.large,
         color: COLORS.darkBlue,
-        textTransform: 'capitalize'
+        textTransform: 'capitalize',
+        fontWeight: 'bold',
+        textAlign: 'center',
+        width: '100%',
+        marginTop: 6
     },
     statusBanner: {
         width: '100%',
         padding: 10,
-        borderRadius: 5,
         alignItems: 'center',
         marginVertical: 15
     },
     statusText: {
-        color: COLORS.white,
-        fontWeight: 'bold',
-        fontSize: 16
-    },
-    cardDados: {
-        borderWidth: 1,
-        borderColor: COLORS.grey,
-        borderRadius: 10,
-        padding: 15,
-        width: '100%'
-    },
-    cardTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
         color: COLORS.darkBlue,
-        marginBottom: 10
-    },
-    infoText: {
-        fontSize: 16,
-        marginVertical: 4
-    },
-    bold: {
-        fontWeight: 'bold'
+        fontWeight: 'bold',
+        fontSize: FONT_SIZE.large
     },
     line: {
         width: '80%',
@@ -169,7 +166,13 @@ const styles = StyleSheet.create({
         backgroundColor: COLORS.darkBlue,
     },
     textHeader: {
-        alignItems: 'center',
-        gap: 5
+        flex: 1,
+        alignItems: 'flex-start',
+        gap: 5,
+        paddingLeft: 15
+    },
+    areaStatus: {
+        flexDirection: 'row',
+        gap: 25
     }
 });
