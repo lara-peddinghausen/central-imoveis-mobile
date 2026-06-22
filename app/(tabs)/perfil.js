@@ -22,14 +22,25 @@ export default function Perfil() {
     // Controla se os inputs estão bloqueados ou liberados para edição
     const [isEditable, setIsEditable] = useState(false);
 
+    // Formata a data vinda do banco (yyyy-mm-dd) para a tela (dd/mm/aaaa)
+    const formatarDataParaExibicao = (dataStr) => {
+        if (!dataStr) return '';
+        if (dataStr.includes('-')) {
+            const [ano, mes, dia] = dataStr.split('-');
+            return `${dia}/${mes}/${ano}`;
+        }
+        return dataStr;
+    };
+
     // Carrega os dados assim que a tela abre ou quando o objeto 'user' atualizar
     useEffect(() => {
         if (user) {
-            // 🚀 Ajustado para bater exatamente com as propriedades do AuthResponse do Java
             setNome(user.nome || '');
             setEmail(user.email || '');
             setCpf(user.cpf || '');
-            setDataNascimento(user.dataNascimento || '');
+            
+            // Converte a data do banco antes de salvar no estado da tela
+            setDataNascimento(formatarDataParaExibicao(user.dataNascimento));
         }
     }, [user]);
 
@@ -42,10 +53,17 @@ export default function Perfil() {
     // Salva as alterações mandando para o backend Java
     const handleSalvar = async () => {
         try {
+            // Garante que se o estado ainda contiver hífens, converte para barras para o Java
+            let dataFormatada = dataNascimento;
+            if (dataNascimento.includes('-')) {
+                const [ano, mes, dia] = dataNascimento.split('-');
+                dataFormatada = `${dia}/${mes}/${ano}`;
+            }
+
             const dadosAtualizados = {
                 id: user.id,
-                nome,
-                dataNascimento
+                nome: nome.trim(),
+                dataNascimento: dataFormatada 
             };
 
             // Envia a requisição PUT para o endpoint do Spring Boot
@@ -56,6 +74,7 @@ export default function Perfil() {
                 setIsEditable(false); // Tranca os inputs novamente
 
                 if (atualizarDadosUser) {
+                    // Atualiza o contexto global do App
                     atualizarDadosUser(dadosAtualizados);
                 }
             }
@@ -77,7 +96,6 @@ export default function Perfil() {
             </View>
 
             <View style={styles.formArea}>
-                {/* 🔓 Nome: Habilita APENAS quando estiver em modo de edição */}
                 <InputItem
                     label='Nome'
                     placeholder='Seu nome completo'
@@ -86,7 +104,6 @@ export default function Perfil() {
                     editable={isEditable}
                 />
 
-                {/* 🔒 E-mail: Nunca pode ser editado, continua desabilitado sempre */}
                 <InputItem
                     label='E-mail'
                     placeholder='seuemail@email.com'
@@ -96,7 +113,6 @@ export default function Perfil() {
                     editable={false}
                 />
 
-                {/* 🔒 CPF: Nunca pode ser editado, continua desabilitado sempre */}
                 <InputItem
                     label='CPF'
                     placeholder='Apenas números, sem pontos ou traços'
@@ -107,7 +123,6 @@ export default function Perfil() {
                     editable={false}
                 />
 
-                {/* 🔓 Data de Nascimento: Habilita APENAS quando estiver em modo de edição */}
                 <InputItem
                     label='Data de nascimento'
                     placeholder='dd/mm/aaaa'
@@ -117,10 +132,8 @@ export default function Perfil() {
                 />
             </View>
 
-            {/* Área dinâmica de botões */}
             <View style={styles.buttonArea}>
                 {isEditable ? (
-                    // Se estiver em modo de edição, mostra "Salvar" e "Cancelar"
                     <>
                         <ButtonDark
                             title="Salvar"
@@ -130,22 +143,21 @@ export default function Perfil() {
                         <ButtonLight
                             title="Cancelar"
                             onPress={() => {
-                                // Restaura os dados originais do contexto salvos no banco
+                                // Restaura os dados originais e formata a data de volta
                                 setNome(user.nome || '');
                                 setEmail(user.email || '');
                                 setCpf(user.cpf || '');
-                                setDataNascimento(user.dataNascimento || '');
-                                setIsEditable(false); // Tranca tudo de novo
+                                setDataNascimento(formatarDataParaExibicao(user.dataNascimento));
+                                setIsEditable(false);
                             }}
                             flex
                         />
                     </>
                 ) : (
-                    // Se estiver bloqueado, mostra os botões padrão "Editar" e "Sair"
                     <>
                         <ButtonDark
                             title="Editar"
-                            onPress={() => setIsEditable(true)} // Destrava os campos permitidos
+                            onPress={() => setIsEditable(true)}
                             flex
                         />
                         <ButtonLight
