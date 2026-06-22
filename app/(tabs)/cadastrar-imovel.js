@@ -37,7 +37,7 @@ export default function CadastrarImovel() {
             return;
         }
 
-        // 🚀 TRAVA 1: Se já estiver salvando, impede um segundo clique
+        // Se já estiver salvando, impede um segundo clique
         if (salvando) return;
 
         setSubmitted(true);
@@ -57,11 +57,11 @@ export default function CadastrarImovel() {
         }
 
         try {
-            setSalvando(true); // 🚀 TRAVA 2: Ativa o loading assim que passa na validação
+            setSalvando(true); // Ativa o loading assim que passa na validação
 
             const formData = new FormData();
 
-            // 1. Injetando textos do imóvel mapeados no Spring Boot
+            // Injetando textos do imóvel mapeados no Spring Boot
             formData.append('nome', nome);
             formData.append('rua', rua);
             formData.append('cep', cep.replace(/\D/g, ''));
@@ -74,10 +74,7 @@ export default function CadastrarImovel() {
             formData.append('status', 'DISPONIVEL');
             formData.append('administrador', user.id);
 
-            // 🚀 O CORTE: Removeu a propriedade fantasma do proprietário daqui. 
-            // Como ela não é enviada, o Spring Boot a interpretará como null com segurança.
-
-            // 2. Injetando o arquivo físico da imagem
+            // Injetando o arquivo físico da imagem
             if (foto) {
                 const uriParts = foto.split('.');
                 const fileType = uriParts[uriParts.length - 1];
@@ -96,7 +93,7 @@ export default function CadastrarImovel() {
             });
 
             if (resposta.status === 201 || resposta.status === 200) {
-                // Pega o ID numérico do imóvel que o Spring Boot acabou de salvar
+                // Pega o ID do imóvel que o Spring Boot acabou de salvar
                 const imovelCriadoId = resposta.data?.id;
 
                 Alert.alert(
@@ -106,7 +103,7 @@ export default function CadastrarImovel() {
                         {
                             text: 'Não',
                             onPress: () => router.replace('/home'),
-                            style: 'cancel' // Deixa o botão com um aspecto secundário discreto
+                            style: 'cancel'
                         },
                         {
                             text: 'Sim, cadastrar propriétário',
@@ -123,7 +120,7 @@ export default function CadastrarImovel() {
             console.error("Erro requisição cadastro:", error);
             Alert.alert('Erro no Cadastro', 'O backend rejeitou os dados.');
         } finally {
-            setSalvando(false); // 🚀 LIBERAÇÃO: Desativa o loading caso dê erro para o usuário tentar de novo
+            setSalvando(false); // Desativa o loading caso dê erro para o usuário tentar de novo
         }
     }
 
@@ -257,7 +254,7 @@ async function buscarCepAutomatico(cepDigitado) {
                 </View>
 
                 <View style={styles.imageArea}>
-                    <ImageSelector onImageSelected={(uri) => setFoto(uri)} />
+                    <ImageSelector textoBtn = "+ Adicionar imagem" onImageSelected={(uri) => setFoto(uri)} />
                 </View>
             </View>
 
