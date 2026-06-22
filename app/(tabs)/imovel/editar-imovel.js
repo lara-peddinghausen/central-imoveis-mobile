@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator, Alert, Image } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { api } from '../../../src/services/api';
 import { COLORS } from '../../../src/theme/colors.js';
@@ -9,11 +9,13 @@ import CheckBox from '../../../src/components/CheckBox/index.js';
 import { ButtonDark } from '../../../src/components/ButtonDark/index.js';
 import { ButtonLight } from '../../../src/components/ButtonLight/index.js';
 import ImageSelector from '../../../src/components/ImageSelector/index.js';
+import { useAuth } from '../../../src/context/AuthContext';
 
 export default function EditarImovel() {
     const router = useRouter();
-    const { id } = useLocalSearchParams();
 
+    const { id } = useLocalSearchParams();
+    const { user } = useAuth();;
     const [carregando, setCarregando] = useState(true);
     const [salvando, setSalvando] = useState(false);
     const [isEditable, setIsEditable] = useState(false);
@@ -31,9 +33,6 @@ export default function EditarImovel() {
     const [status, setStatus] = useState('DISPONIVEL');
     const [foto, setFoto] = useState(null);
     const [fotoOriginal, setFotoOriginal] = useState(null);
-    
-    // Guarda apenas o ID do proprietário para passar na rota de edição dele depois
-    const [idProprietario, setIdProprietario] = useState(null);
 
     const BASE_URL = 'http://10.0.2.2:8080';
 
@@ -61,13 +60,6 @@ export default function EditarImovel() {
                 setFotoOriginal(urlCompletaFoto);
             }
 
-            // Apenas memoriza se esse imóvel tem um proprietário vinculado
-            if (imovel.proprietario?.id) {
-                setIdProprietario(imovel.proprietario.id);
-            } else {
-                setIdProprietario(null);
-            }
-
         } catch (error) {
             console.error("Erro ao puxar imóvel:", error);
             Alert.alert('Erro', 'Não foi possível carregar os dados do imóvel.');
@@ -80,12 +72,11 @@ export default function EditarImovel() {
         if (id) carregarImovel();
     }, [id]);
 
-    // Envia os dados atualizados usando Multipart/Form-Data
+    // Envia os dados atualizados usando Multipart/Form-Data parciais (Null-Safe no Java)
     const handleSalvar = async () => {
         if (salvando) return;
         setSubmitted(true);
 
-        // Validação focada apenas nas regras do Imóvel
         const camposImovelInvalidos = !nome.trim() || !numero.trim();
 
         if (camposImovelInvalidos) {
@@ -97,10 +88,12 @@ export default function EditarImovel() {
             setSalvando(true);
 
             const formData = new FormData();
+            formData.append('id', String(id));
             formData.append('nome', nome);
-            formData.append('tipoLocacao', tipoLocacao);
             formData.append('numero', numero);
             formData.append('complemento', complemento);
+            formData.append('tipoLocacao', tipoLocacao);
+            formData.append('status', status); // Passa o status atual do imóvel
 
             if (foto && foto !== fotoOriginal) {
                 const uriParts = foto.split('.');
@@ -113,14 +106,18 @@ export default function EditarImovel() {
                 });
             }
 
-            // Faz o PUT focado unicamente na entidade Imóvel
-            await api.put(`/imovel/${id}`, formData, {
-                headers: { 'Content-Type': 'multipart/form-data' }
+            // Chamando como POST na rota de atualização
+            await api.post(`/imovel/atualizar/${id}`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
             });
 
             Alert.alert('Sucesso', 'Imóvel atualizado com sucesso!', [
                 { text: 'OK', onPress: () => router.replace(`/imovel/${id}`) }
             ]);
+
+            setIsEditable(false);
 
         } catch (error) {
             console.error("Erro ao atualizar dados:", error);
@@ -148,7 +145,6 @@ export default function EditarImovel() {
             </View>
 
             <View style={styles.formArea}>
-
                 <InputItem
                     label="Nome do Imóvel *"
                     placeholder="Ex: Apartamento no Centro"
@@ -158,25 +154,25 @@ export default function EditarImovel() {
                     isRequired
                     error={submitted && !nome.trim()}
                 />
-                
+
                 <InputItem label="CEP" value={cep} editable={false} />
                 <InputItem label="Rua" value={rua} editable={false} />
-                
-                <InputItem 
-                    label="Número *" 
-                    value={numero} 
-                    onChangeText={setNumero} 
-                    editable={isEditable} 
-                    isRequired 
+
+                <InputItem
+                    label="Número *"
+                    value={numero}
+                    onChangeText={setNumero}
+                    editable={isEditable}
+                    isRequired
                     error={submitted && !numero.trim()}
                 />
-                <InputItem 
-                    label="Complemento" 
-                    value={complemento} 
-                    onChangeText={setComplemento} 
-                    editable={isEditable} 
+                <InputItem
+                    label="Complemento"
+                    value={complemento}
+                    onChangeText={setComplemento}
+                    editable={isEditable}
                 />
-                
+
                 <InputItem label="Bairro" value={bairro} editable={false} />
                 <InputItem label="Cidade" value={cidade} editable={false} />
                 <InputItem label="Estado" value={estado} editable={false} />
@@ -205,13 +201,13 @@ export default function EditarImovel() {
                         <CheckBox
                             label="Disponível"
                             isSelected={status === 'DISPONIVEL'}
-                            onPress={() => {}}
+                            onPress={() => { }}
                             disabled={true}
                         />
                         <CheckBox
                             label="Alugado"
                             isSelected={status === 'ALUGADO'}
-                            onPress={() => {}}
+                            onPress={() => { }}
                             disabled={true}
                         />
                     </View>
@@ -219,14 +215,33 @@ export default function EditarImovel() {
 
                 <View style={styles.imageArea}>
                     <Text style={[styles.text, { alignSelf: 'flex-start', marginLeft: 5 }]}>Foto do Imóvel:</Text>
-                    <ImageSelector
-                        currentImage={foto}
-                        onImageSelected={(uri) => isEditable && setFoto(uri)}
-                    />
+
+                    {foto ? (
+                        <Image
+                            source={{ uri: foto }}
+                            style={[
+                                styles.fotoPrevia,
+                                !isEditable && { opacity: 0.8, borderColor: COLORS.lightGrey }
+                            ]}
+                            resizeMode="cover"
+                        />
+                    ) : (
+                        <Text style={styles.semFotoText}>Nenhuma foto cadastrada para este imóvel.</Text>
+                    )}
+
+                    <View
+                        pointerEvents={isEditable ? 'auto' : 'none'}
+                        style={{ width: '100%', opacity: isEditable ? 1 : 0.5, alignItems: 'center' }}
+                    >
+                        <ImageSelector
+                            textoBtn="Alterar imagem"
+                            currentImage={foto}
+                            onImageSelected={(uri) => setFoto(uri)}
+                        />
+                    </View>
                 </View>
             </View>
 
-            {/*Área Dinâmica de Botões focada na navegação modular */}
             <View style={styles.buttonArea}>
                 {isEditable ? (
                     <>
@@ -252,14 +267,6 @@ export default function EditarImovel() {
                             onPress={() => setIsEditable(true)}
                             flex
                         />
-                        {/* 👤 Só exibe o botão Proprietário se o imóvel possuir um ID de proprietário válido */}
-                        {idProprietario && (
-                            <ButtonDark
-                                title="Proprietário"
-                                onPress={() => router.push(`/proprietario/editar-proprietario?id=${idProprietario}`)}
-                                flex
-                            />
-                        )}
                         <ButtonLight
                             title="Voltar"
                             onPress={() => router.replace(`/imovel/${id}`)}
@@ -319,12 +326,6 @@ const styles = StyleSheet.create({
         paddingBottom: 20,
         paddingTop: 20
     },
-    formTitle: {
-        fontSize: FONT_SIZE.large,
-        color: COLORS.darkBlue,
-        fontWeight: 'bold',
-        marginVertical: 15,
-    },
     fieldContainer: {
         paddingHorizontal: 20,
         alignSelf: 'flex-start',
@@ -335,7 +336,6 @@ const styles = StyleSheet.create({
         fontSize: FONT_SIZE.small,
         marginBottom: 10,
         color: COLORS.black,
-        fontWeight: 'bold'
     },
     checkBoxArea: {
         flexDirection: 'row',
@@ -353,5 +353,19 @@ const styles = StyleSheet.create({
         width: '90%',
         gap: 10,
         marginTop: 10
+    },
+    fotoPrevia: {
+        width: '100%',
+        height: 200,
+        borderRadius: 10,
+        marginBottom: 15,
+        borderWidth: 1,
+        borderColor: COLORS.grey,
+    },
+    semFotoText: {
+        fontSize: FONT_SIZE.small,
+        color: COLORS.grey,
+        fontStyle: 'italic',
+        marginVertical: 15,
     }
 });
