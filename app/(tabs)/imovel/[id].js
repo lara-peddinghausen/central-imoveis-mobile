@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { View, Text, StyleSheet, Image, ScrollView, ActivityIndicator, Alert } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
-import { api } from '../../../src/services/api'; // ajuste seu caminho de import
+import { useLocalSearchParams, useFocusEffect } from 'expo-router';
+import { api } from '../../../src/services/api';
 import { COLORS } from '../../../src/theme/colors';
 import { IconAlugado, IconDisponivel } from '../../../src/components/Icons';
 import { FONT_SIZE } from '../../../src/theme/typography';
@@ -9,7 +9,7 @@ import DataItem from '../../../src/components/DataItem';
 
 
 export default function DetalhesImovel() {
-    // 🚀 Captura o ID vindo da URL
+    // Captura o ID vindo da URL
     const { id } = useLocalSearchParams();
 
     const [imovel, setImovel] = useState(null);
@@ -17,26 +17,28 @@ export default function DetalhesImovel() {
 
     const BASE_URL = 'http://10.0.2.2:8080';
 
-    useEffect(() => {
-        async function buscarDadosDoBanco() {
-            try {
-                // 🔒 Busca segura e autenticada direta do Spring Boot usando o ID
-                const response = await api.get(`/imovel/${id}`);
-                setImovel(response.data);
-            } catch (error) {
-                console.error("Erro ao buscar detalhes:", error.message);
-                Alert.alert('Erro', 'Não foi possível carregar os dados atualizados deste imóvel.');
-            } finally {
-                setCarregando(false);
+    useFocusEffect(
+        useCallback(() => {
+            async function buscarDadosDoBanco() {
+                try {
+                    // Busca segura e autenticada direta do Spring Boot usando o ID
+                    const response = await api.get(`/imovel/${id}`);
+                    setImovel(response.data);
+                } catch (error) {
+                    console.error("Erro ao buscar detalhes:", error.message);
+                    Alert.alert('Erro', 'Não foi possível carregar os dados atualizados deste imóvel.');
+                } finally {
+                    setCarregando(false);
+                }
             }
-        }
 
-        if (id) {
-            buscarDadosDoBanco();
-        }
-    }, [id]);
+            if (id) {
+                buscarDadosDoBanco();
+            }
+        }, [id])
+    );
 
-    // ⏳ Enquanto o Spring Boot responde, exibe o loading na tela
+    // Loading na tela
     if (carregando) {
         return (
             <View style={styles.loadingContainer}>
@@ -46,7 +48,7 @@ export default function DetalhesImovel() {
         );
     }
 
-    // Se o imóvel não for encontrado por segurança
+    // Se o imóvel não for encontrado
     if (!imovel) {
         return (
             <View style={styles.loadingContainer}>
@@ -55,7 +57,6 @@ export default function DetalhesImovel() {
         );
     }
 
-    // 🎨 Renderização perfeita e dinâmica com a "Fonte Única da Verdade" do Banco de Dados
     return (
         <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
             <View style={styles.line} />
@@ -85,9 +86,8 @@ export default function DetalhesImovel() {
                 </Text>
             </View>
 
-            
-
             <DataItem imovel={imovel} />
+
         </ScrollView>
     );
 }
@@ -114,22 +114,22 @@ const styles = StyleSheet.create({
     },
     header: {
         flexDirection: 'row',
-        alignItems: 'center',       // Centraliza os elementos na vertical (alinhados pelo meio da foto)
+        alignItems: 'center',      
         justifyContent: 'center',
         width: '100%',
         paddingHorizontal: 20,
     },
     img: {
-        width: '50%',                   // 🚀 LARGURA FIXA: A imagem mantém um tamanho elegante fixo
+        width: '50%',                   
         height: 120,
         borderRadius: 10,
         resizeMode: 'cover'
     },
 
     textHeader: {
-        flex: 1,                      // Ocupa todo o resto da tela de forma dinâmica
-        justifyContent: 'center',     // Centraliza o bloco de textos na vertical
-        alignItems: 'center',         // Centraliza o título em relação ao subtítulo
+        flex: 1,                     
+        justifyContent: 'center',     
+        alignItems: 'center',         
         paddingLeft: 10,
 
     },
