@@ -4,7 +4,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { COLORS } from '../../theme/colors';
 import { FONT_SIZE } from '../../theme/typography';
 
-export default function ImageSelector({ onImageSelected }) {
+export default function ImageSelector({ onImageSelected, textoBtn }) {
   const [previewUri, setPreviewUri] = useState(null);
 
   const selecionarImagem = async () => {
@@ -25,7 +25,7 @@ export default function ImageSelector({ onImageSelected }) {
     if (!resultado.canceled) {
       const uri = resultado.assets[0].uri;
       setPreviewUri(uri); // Atualiza a miniatura local no componente
-      onImageSelected(uri); // Envia a URI para a tela de cadastro (Pai)
+      onImageSelected(uri); // Envia a URI para a tela de cadastro
     }
   };
 
@@ -33,11 +33,10 @@ export default function ImageSelector({ onImageSelected }) {
     setPreviewUri(null);
     onImageSelected(null); // Avisa a tela de cadastro que a imagem foi removida
   };
-
   return (
     <View style={styles.container}>
       <TouchableOpacity onPress={selecionarImagem} activeOpacity={0.7}>
-        <Text style={styles.linkText}>+ Adicionar imagem</Text>
+        <Text style={styles.linkText}>{textoBtn}</Text>
       </TouchableOpacity>
 
       {previewUri && (
