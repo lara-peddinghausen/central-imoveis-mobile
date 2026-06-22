@@ -9,82 +9,95 @@ export default function DataItem({ imovel }) {
 
     if (!imovel) return null;
 
-    const handleEditar = () => {
+    const EditarImovel = () => {
         router.push(`/imovel/editar-imovel?id=${imovel.id}`);
     };
 
-return (
-    <View style={styles.cardImovel} >
-        <View style={styles.areaTituloCardImovel}>
-            <Text style={styles.tituloCardImovel}>Dados</Text>
-        </View>
+    const EditarProprietario = () => {
+        router.push(`/proprietario/editar-proprietario?id=${imovel.proprietario.id}&imovelId=${imovel.id}`);
+    };
 
-        <View style={styles.areaConteudoCard}>
-            <Text style={styles.infoText}>
-                <Text style={styles.bold}>Rua: </Text>
-                {imovel.rua}, {imovel.numero}
-            </Text>
+    return (
+        <View style={styles.cardImovel} >
+            <View style={styles.areaTituloCardImovel}>
+                <Text style={styles.tituloCardImovel}>Dados</Text>
+            </View>
 
-            {imovel.complemento ? <Text style={styles.infoText}>
-                <Text style={styles.bold}>Complemento: </Text>
-                {imovel.complemento}
-            </Text> : null}
+            <View style={styles.areaConteudoCard}>
+                <Text style={styles.infoText}>
+                    <Text style={styles.bold}>Rua: </Text>
+                    {imovel.rua}, {imovel.numero}
+                </Text>
 
-            <Text style={styles.infoText}>
-                <Text style={styles.bold}>Bairro: </Text>
-                {imovel.bairro}
-            </Text>
-
-            <Text style={styles.infoText}>
-                <Text style={styles.bold}>Cidade/Estado: </Text>
-                {imovel.cidade} - {imovel.estado}
-            </Text>
-
-            <Text style={styles.infoText}>
-                <Text style={styles.bold}>CEP: </Text>
-                {imovel.cep}
-            </Text>
-
-            {imovel.proprietario ? <View>
-                <View style={styles.line} />
-                <Text style={styles.tituloProprietario}>Proprietário</Text>
+                {imovel.complemento ? <Text style={styles.infoText}>
+                    <Text style={styles.bold}>Complemento: </Text>
+                    {imovel.complemento}
+                </Text> : null}
 
                 <Text style={styles.infoText}>
-                    <Text style={styles.bold}>Nome: </Text>
-                    {imovel.proprietario.nome}
+                    <Text style={styles.bold}>Bairro: </Text>
+                    {imovel.bairro}
                 </Text>
 
                 <Text style={styles.infoText}>
-                    <Text style={styles.bold}>CPF: </Text>
-                    {imovel.proprietario.cpf}
+                    <Text style={styles.bold}>Cidade/Estado: </Text>
+                    {imovel.cidade} - {imovel.estado}
                 </Text>
 
                 <Text style={styles.infoText}>
-                    <Text style={styles.bold}>Data de nascimento: </Text>
-                    {imovel.proprietario.dataNascimento}
+                    <Text style={styles.bold}>CEP: </Text>
+                    {imovel.cep}
                 </Text>
 
-                <Text style={styles.infoText}>
-                    <Text style={styles.bold}>E-mail: </Text>
-                    {imovel.proprietario.email}
-                </Text>
+                <ButtonDark
+                    title="Editar"
+                    onPress={EditarImovel}
+                />
 
-                <Text style={styles.infoText}>
-                    <Text style={styles.bold}>Telefone: </Text>
-                    {imovel.proprietario.telefone}
-                </Text>
+                {imovel.proprietario ? <View>
+                    <View style={styles.line} />
+                    <Text style={styles.tituloProprietario}>Proprietário</Text>
+
+                    <Text style={styles.infoText}>
+                        <Text style={styles.bold}>Nome: </Text>
+                        {imovel.proprietario.nome}
+                    </Text>
+
+                    <Text style={styles.infoText}>
+                        <Text style={styles.bold}>CPF: </Text>
+                        {imovel.proprietario.cpf}
+                    </Text>
+
+                    <Text style={styles.infoText}>
+                        <Text style={styles.bold}>Data de nascimento: </Text>
+                        {imovel.proprietario.dataNascimento}
+                    </Text>
+
+                    <Text style={styles.infoText}>
+                        <Text style={styles.bold}>E-mail: </Text>
+                        {imovel.proprietario.email}
+                    </Text>
+
+                    <Text style={styles.infoText}>
+                        <Text style={styles.bold}>Telefone: </Text>
+                        {imovel.proprietario.telefone}
+                    </Text>
+
+
+                    <ButtonDark
+                        title="Editar"
+                        onPress={EditarProprietario}
+                    />
+
+                </View>
+                    : null}
 
             </View>
-                : null}
-        </View>
 
-        <ButtonDark
-            title="Editar"
-            onPress={handleEditar}
-        />
 
-    </View >
-);
+
+        </View >
+    );
 }
 
 const styles = StyleSheet.create({
