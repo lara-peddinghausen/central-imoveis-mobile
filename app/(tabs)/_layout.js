@@ -77,7 +77,7 @@ export default function TabsLayout() {
                 }}
             />
             <Tabs.Screen
-                name="imovel/contrato"
+                name="imovel/cadastrar-locacao"
                 options={{
                     href: null,
                     headerShown: false
@@ -118,6 +118,21 @@ export default function TabsLayout() {
                     headerShown: false
                 }}
             />
+            <Tabs.Screen
+                name="inquilino/cadastrar-inquilino"
+                options={{
+                    href: null,
+                    headerShown: false
+                }}
+            />
+            <Tabs.Screen
+                name="inquilino/editar-inquilino"
+                options={{
+                    href: null,
+                    headerShown: false
+                }}
+            />
+
 
 
 
