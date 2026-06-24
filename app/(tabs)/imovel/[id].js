@@ -3,9 +3,10 @@ import { View, Text, StyleSheet, Image, ScrollView, ActivityIndicator, Alert } f
 import { useLocalSearchParams, useFocusEffect } from 'expo-router';
 import { api } from '../../../src/services/api';
 import { COLORS } from '../../../src/theme/colors';
-import { IconAlugado, IconDisponivel } from '../../../src/components/Icons';
+import { IconAlugado, IconContrato, IconDisponivel } from '../../../src/components/Icons';
 import { FONT_SIZE } from '../../../src/theme/typography';
 import DataItem from '../../../src/components/DataItem';
+import ButtonLocacao from '../../../src/components/ButtonLocacao';
 
 
 export default function DetalhesImovel() {
@@ -88,6 +89,23 @@ export default function DetalhesImovel() {
 
             <DataItem imovel={imovel} />
 
+            <View style={styles.line} />
+
+            <View style={styles.areaSubtitulo}>
+                <IconContrato color={COLORS.darkBlue} />
+                <Text style={styles.subtitulo}>Locações</Text>
+            </View>
+            <ButtonLocacao
+                imovelId={imovel?.id}
+                statusImovel={imovel?.status}
+            />
+
+            <View style={styles.line} />
+
+
+
+
+
         </ScrollView>
     );
 }
@@ -114,22 +132,22 @@ const styles = StyleSheet.create({
     },
     header: {
         flexDirection: 'row',
-        alignItems: 'center',      
+        alignItems: 'center',
         justifyContent: 'center',
         width: '100%',
         paddingHorizontal: 20,
     },
     img: {
-        width: '50%',                   
+        width: '50%',
         height: 120,
         borderRadius: 10,
         resizeMode: 'cover'
     },
 
     textHeader: {
-        flex: 1,                     
-        justifyContent: 'center',     
-        alignItems: 'center',         
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
         paddingLeft: 10,
 
     },
@@ -174,5 +192,14 @@ const styles = StyleSheet.create({
     areaStatus: {
         flexDirection: 'row',
         gap: 25
+    },
+    subtitulo: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: COLORS.darkBlue
+    },
+    areaSubtitulo: {
+        gap: 2,
+        alignItems: 'center'
     }
 });
