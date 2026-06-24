@@ -9,6 +9,7 @@ import { AuthContext } from '../../src/context/AuthContext'; // Garantido o uso 
 import { api } from '../../src/services/api';
 import { useFocusEffect } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { FONT_SIZE } from '../../src/theme/typography';
 
 
 export default function Home() {
@@ -38,13 +39,13 @@ export default function Home() {
         useCallback(() => {
             async function carregarDadosIniciais() {
                 try {
-                     // Recupera o token salvo direto do celular antes de fazer a busca
-                const tokenSalvo = await AsyncStorage.getItem('@centralImoveis:token');
-                
-                // Se o token existir, garante que ele está nos cabeçalhos da API para evitar o 403
-                if (tokenSalvo) {
-                    api.defaults.headers.common['Authorization'] = `Bearer ${tokenSalvo}`;
-                }
+                    // Recupera o token salvo direto do celular antes de fazer a busca
+                    const tokenSalvo = await AsyncStorage.getItem('@centralImoveis:token');
+
+                    // Se o token existir, garante que ele está nos cabeçalhos da API para evitar o 403
+                    if (tokenSalvo) {
+                        api.defaults.headers.common['Authorization'] = `Bearer ${tokenSalvo}`;
+                    }
 
                     // Busca o perfil do administrador
                     const perfilResponse = await api.get('/administrador/perfil');
@@ -70,12 +71,12 @@ export default function Home() {
                 } catch (error) {
                     console.log("Erro ao carregar dados do backend:", error.message);
 
-                                    
-                // Adicione este log detalhado para vermos no terminal o motivo exato do 403
-                if (error.response) {
-                    console.log("Status do Erro:", error.response.status);
-                    console.log("Detalhes do Erro do Spring:", error.response.data);
-                }
+
+                    // Adicione este log detalhado para vermos no terminal o motivo exato do 403
+                    if (error.response) {
+                        console.log("Status do Erro:", error.response.status);
+                        console.log("Detalhes do Erro do Spring:", error.response.data);
+                    }
                 } finally {
                     setCarregandoPerfil(false);
                 }
@@ -91,7 +92,18 @@ export default function Home() {
     // Atualiza o título do cabeçalho
     useEffect(() => {
         navigation.setOptions({
-            title: `Olá, ${nomeUsuario || 'Usuário'}!`
+            title: `Olá, ${nomeUsuario || 'Usuário'}!`,
+            headerStyle: {
+                backgroundColor: COLORS.darkBlue, 
+                height: 90, 
+            },
+            headerTitleStyle: {
+                fontSize: FONT_SIZE.xlarge,
+                fontWeight: 'bold',
+                color: COLORS.white,
+            },
+            headerTitleAlign: 'center',
+            headerStatusBarHeight: 40,
         });
     }, [navigation, nomeUsuario]);
 
