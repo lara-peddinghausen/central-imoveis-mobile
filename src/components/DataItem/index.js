@@ -110,6 +110,7 @@ const styles = StyleSheet.create({
         maxWidth: 350,
         borderTopWidth: 0,
         paddingBottom: 15,
+        marginBottom: 20
     },
     areaTituloCardImovel: {
         flexDirection: 'row',
