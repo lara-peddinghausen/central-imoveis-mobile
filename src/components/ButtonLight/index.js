@@ -5,17 +5,17 @@ import { FONT_SIZE } from "../../theme/typography";
 export const ButtonLight = ({ onPress, title, flex = false }) => {
     return (
         <Pressable style={[
-            styles.btn,
+            styles.botao,
             flex && { flex: 1 }
         ]}
             onPress={onPress}>
-            <Text style={styles.btnText}>{title}</Text>
+            <Text style={styles.textoBotao}>{title}</Text>
         </Pressable>
     )
 }
 
 const styles = StyleSheet.create({
-    btn: {
+    botao: {
         alignItems: 'center',
         justifyContent: 'center',
         minWidth: 120,
@@ -26,7 +26,7 @@ const styles = StyleSheet.create({
         marginTop: 20,
         paddingHorizontal: 12,
     },
-    btnText: {
+    textoBotao: {
         fontWeight: 'bold',
         fontSize: FONT_SIZE.medium,
         color: COLORS.white,

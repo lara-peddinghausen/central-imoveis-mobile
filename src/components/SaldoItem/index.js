@@ -10,12 +10,12 @@ export default function Saldo({ financeiro }) {
     if (!financeiro) return null;
 
     return (
-        <View style={styles.cardImovel} >
-            <View style={styles.areaTituloCardImovel}>
-                <Text style={styles.tituloCardImovel}>Saldo atual</Text>
+        <View style={styles.container} >
+            <View style={styles.areaTitulo}>
+                <Text style={styles.titulo}>Saldo atual</Text>
             </View>
 
-            <View style={styles.areaConteudoCard}>
+            <View style={styles.areaConteudo}>
                 <Text style={styles.bold}>
                     {}
                 </Text>
@@ -24,7 +24,6 @@ export default function Saldo({ financeiro }) {
 
             <ButtonDark
                 title="Ver detalhes"
-
             />
 
         </View >
@@ -32,7 +31,7 @@ export default function Saldo({ financeiro }) {
 }
 
 const styles = StyleSheet.create({
-    cardImovel: {
+    container: {
         alignItems: 'center',
         borderWidth: 1,
         borderColor: COLORS.grey,
@@ -42,7 +41,7 @@ const styles = StyleSheet.create({
         borderTopWidth: 0,
         paddingBottom: 15,
     },
-    areaTituloCardImovel: {
+    areaTitulo: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
@@ -59,12 +58,12 @@ const styles = StyleSheet.create({
         borderTopLeftRadius: 10,
         borderTopRightRadius: 10,
     },
-    tituloCardImovel: {
+    titulo: {
         fontSize: 20,
         fontWeight: 'bold',
         color: COLORS.darkBlue
     },
-    areaConteudoCard: {
+    areaConteudo: {
         padding: 15,
         width: '100%'
     },
@@ -73,7 +72,7 @@ const styles = StyleSheet.create({
         height: 100,
         borderRadius: 8
     },
-    areaTextoCard: {
+    areaTexto: {
         flex: 1,
         alignItems: 'flex-start',
     },
@@ -87,21 +86,20 @@ const styles = StyleSheet.create({
         color: COLORS.black,
         marginBottom: 4,
     },
-
     tipoImovel: {
         fontSize: 16,
         fontWeight: 'bold',
         color: COLORS.darkBlue,
         marginTop: 8,
     },
-    infoText: {
+    textoInformacao: {
         fontSize: 16,
         marginVertical: 2
     },
     bold: {
         fontWeight: 'bold'
     },
-    line: {
+    linha: {
         width: '80%',
         height: 2,
         backgroundColor: COLORS.darkBlue,

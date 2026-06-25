@@ -2,15 +2,15 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // ─── URL BASE UNIFICADA ────────────────────────────────────────
-// Ajustada para apontar corretamente para a raiz do seu Spring Boot
+// Ajustada para apontar corretamente para a raiz do Spring Boot
 const API_URL = 'http://10.0.2.2:8080';
 
-// 🚀 CHAVES PADRONIZADAS (Alinhadas perfeitamente com o seu AuthContext)
+// CHAVES PADRONIZADAS (Alinhadas com o  AuthContext)
 const TOKEN_KEY = '@centralImoveis:token';
 const USER_KEY = '@centralImoveis:user';
 
 // ─── INSTÂNCIA PADRÃO DO AXIOS ──────────────────────────────────
-// Esta é a instância que você importa em Home.js e AuthContext.js
+// Instância importada em Home.js e AuthContext.js
 export const api = axios.create({
     baseURL: API_URL,
     headers: {
@@ -52,7 +52,7 @@ export async function logout() {
     delete api.defaults.headers.common['Authorization'];
 }
 
-// ─── LER TOKEN (Corrigido para pegar a chave certa!) ───────────
+// ─── LER TOKEN  ─────────────────────────────────────────────────
 export async function getToken() {
     return AsyncStorage.getItem(TOKEN_KEY);
 }

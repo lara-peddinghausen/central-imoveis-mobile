@@ -13,33 +13,33 @@ export default function ButtonLocacao({ imovelId, statusImovel }) {
     const isCadastroDesativado = statusImovel === 'ALUGADO';
 
     return (
-        <View style={styles.buttonArea}>
+        <View style={styles.areaBotoes}>
 
             <TouchableOpacity
                 style={[
-                    styles.button,
-                    isCadastroDesativado ? styles.buttonDisabled : styles.buttonDark
+                    styles.botao,
+                    isCadastroDesativado ? styles.botaoDisabled : styles.botaoDark
                 ]}
                 // Rota direta passando o id do imóvel por parâmetro
                 onPress={() => router.push(`/imovel/cadastrar-locacao?imovelId=${imovelId}`)}
                 disabled={isCadastroDesativado} 
             >
-                <Text style={styles.buttonText}>Cadastrar contrato</Text>
+                <Text style={styles.textoBotao}>Cadastrar contrato</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-                style={[styles.button, styles.buttonDark]}
+                style={[styles.botao, styles.botaoDark]}
                 // Rota direta para a tela correspondente do histórico
                 // onPress={() => router.push(`/imovel/historico-contratos?imovelId=${imovelId}`)}
             >
-                <Text style={styles.buttonText}>Ver histórico</Text>
+                <Text style={styles.textoBotao}>Ver histórico</Text>
             </TouchableOpacity>
         </View>
     );
 }
 
 const styles = StyleSheet.create({
-    buttonArea: {
+    areaBotoes: {
         flexDirection: 'row',
         width: '90%',
         gap: 15,
@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 20,
     },
-    button: {
+    botao: {
         flex: 1, 
         height: 60, 
         borderRadius: 12,
@@ -55,13 +55,13 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 10,
     },
-    buttonDisabled: {
+    botaoDisabled: {
         backgroundColor: COLORS.grey,
     },
-    buttonDark: {
+    botaoDark: {
         backgroundColor: COLORS.darkBlue, 
     },
-    buttonText: {
+    textoBotao: {
         color: COLORS.white,
         fontSize: FONT_SIZE.medium,
         fontWeight: 'bold',

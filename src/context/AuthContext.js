@@ -40,10 +40,10 @@ export function AuthProvider({ children }) {
 
       console.log("👉 O QUE O JAVA ESTÁ DEVOLVENDO NO LOGIN:", response.data);
 
-      // 🚀 1. CAPTURA ATUALIZADA: Pegando todos os novos campos que o Java enviou
+      // Pega todos os novos campos que o Java enviou
       const { token, role, id, nome, cpf, dataNascimento, email: emailDoBanco } = response.data;
 
-      // 🚀 2. OBJETO ATUALIZADO: Incluindo os novos campos para a tela de Perfil ler
+      // Inclui os novos campos para a tela de Perfil ler
       const usuarioLogado = { id, email: emailDoBanco || email, role, nome, cpf, dataNascimento };
       setUser(usuarioLogado);
 

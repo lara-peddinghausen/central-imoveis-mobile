@@ -32,21 +32,21 @@ export default function ImovelItem({ imovel }) {
     };
 
     return (
-        <View style={styles.cardImovel} >
+        <View style={styles.container} >
             <View style={[
-                styles.areaTituloCardImovel,
+                styles.areaTitulo,
                 { backgroundColor: corStatus }
             ]}>
                 {iconStatus}
-                <Text style={styles.tituloCardImovel}>{textoStatus}</Text>
+                <Text style={styles.titulo}>{textoStatus}</Text>
             </View>
-            <View style={styles.areaConteudoCard}>
+            <View style={styles.areaConteudo}>
                 <Image
                     style={styles.img}
                     source={imagemSource}
                     resizeMode="cover"
                 />
-                <View style={styles.areaTextoCard}>
+                <View style={styles.areaTexto}>
                     <Text style={styles.tituloImovel}>{imovel.nome}</Text>
                     <Text style={styles.enderecoImovel}>{imovel.rua}, {imovel.numero}</Text>
                     <Text style={styles.tipoImovel}>{imovel.tipoLocacao}</Text>
@@ -63,7 +63,7 @@ export default function ImovelItem({ imovel }) {
 }
 
 const styles = StyleSheet.create({
-    cardImovel: {
+    container: {
         alignItems: 'center',
         borderWidth: 1,
         borderColor: COLORS.grey,
@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
         borderTopWidth: 0,
         paddingBottom: 15,
     },
-    areaTituloCardImovel: {
+    areaTitulo: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
@@ -90,13 +90,13 @@ const styles = StyleSheet.create({
         borderTopLeftRadius: 10,
         borderTopRightRadius: 10,
     },
-    tituloCardImovel: {
+    titulo: {
         fontSize: 20,
         fontWeight: 'bold',
         color: COLORS.darkBlue,
         marginLeft: -30
     },
-    areaConteudoCard: {
+    areaConteudo: {
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: 16,
@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
         height: 100,
         borderRadius: 8
     },
-    areaTextoCard: {
+    areaTexto: {
         flex: 1,
         alignItems: 'flex-start',
     },
@@ -123,13 +123,11 @@ const styles = StyleSheet.create({
         color: COLORS.black,
         marginBottom: 4,
     },
-
     tipoImovel: {
         fontSize: 16,
         fontWeight: 'bold',
         color: COLORS.darkBlue,
         marginTop: 8,
-    },
-
+    }
 
 })

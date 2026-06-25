@@ -15,6 +15,7 @@ export default function Login() {
     const [senha, setSenha] = useState('');
     const [loading, setLoading] = useState(false);
 
+    // Fazer login
     const entrar = async () => {
         if (!email || !senha) {
             Alert.alert('Erro', 'Preencha todos os campos');
@@ -30,7 +31,6 @@ export default function Login() {
         } catch (error) {
             console.error(error);
             
-            // 🚀 TRATAMENTO DO ERRO DE CONEXÃO COM O BANCO DE DADOS (STATUS 500):
             if (error.response) {
                 if (error.response.status === 500) {
                     Alert.alert(
@@ -41,7 +41,6 @@ export default function Login() {
                     Alert.alert('Erro de Autenticação', 'E-mail ou senha inválidos.');
                 }
             } else {
-                // Erro de rede genérico (ex: backend offline ou IP mudou)
                 Alert.alert('Erro de Conexão', 'Não foi possível conectar ao servidor backend.');
             }
         } finally {
@@ -56,25 +55,27 @@ export default function Login() {
     return (
         <View style={styles.container}>
 
-            {/* 🚀 MODAL DE LOADING EM TELA CHEIA */}
+            {/* Loading */}
             <Modal transparent={true} animationType="none" visible={loading}>
                 <View style={styles.loadingContainer}>
-                    <View style={styles.loadingBox}>
+                    <View style={styles.areaLoading}>
                         <ActivityIndicator size="large" color={COLORS.darkBlue} />
-                        <Text style={styles.loadingText}>Acessando sistema...</Text>
+                        <Text style={styles.textoLoading}>Acessando sistema...</Text>
                     </View>
                 </View>
             </Modal>
 
+            {/* Logo */}
             <Image
                 source={require('../src/assets/images/logo1.png')}
                 style={styles.img}
                 resizeMode="contain"
             />
 
-            <View style={styles.inputArea}>
+            {/* Input do login */}
+            <View style={styles.areaInput}>
 
-                <View style={styles.fieldsWrapper}>
+                <View style={styles.input}>
                     <InputItem
                         label='E-mail'
                         placeholder='Digite seu e-mail'
@@ -93,8 +94,8 @@ export default function Login() {
                     />
                 </View>
 
-                {/* O botão "Entrar" agora fica visível fixo, sem sumir pelo loading local */}
-                <View style={styles.buttonsArea}>
+                {/* Botões */}
+                <View style={styles.areaBotoes}>
                     <ButtonLight
                         title="Cadastrar"
                         onPress={cadastrar}
@@ -128,12 +129,12 @@ const styles = StyleSheet.create({
         aspectRatio: 1.12,
         alignSelf: 'center'
     },
-    buttonsArea: {
+    areaBotoes: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         gap: 10,
     },
-    inputArea: {
+    areaInput: {
         borderWidth: 1,
         borderRadius: 20,
         paddingVertical: 25,
@@ -142,18 +143,17 @@ const styles = StyleSheet.create({
         width: '100%',
         alignSelf: 'center'
     },
-    fieldsWrapper: {
+    input: {
         marginBottom: 15,
         width: '100%'
     },
-    // 🚀 NOVOS ESTILOS DO LOADING EM TELA CHEIA:
     loadingContainer: {
         flex: 1,
-        backgroundColor: 'rgba(0, 0, 0, 0.4)', // Escurece levemente o fundo da tela
+        backgroundColor: 'rgba(0, 0, 0, 0.4)',
         justifyContent: 'center',
         alignItems: 'center',
     },
-    loadingBox: {
+    areaLoading: {
         backgroundColor: 'white',
         padding: 30,
         borderRadius: 15,
@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.2,
         shadowRadius: 4,
     },
-    loadingText: {
+    textoLoading: {
         color: COLORS.darkBlue,
         fontWeight: 'bold',
         fontSize: 15,

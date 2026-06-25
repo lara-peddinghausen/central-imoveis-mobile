@@ -18,33 +18,36 @@ export default function DadosImovelItem({ imovel }) {
     };
 
     return (
-        <View style={styles.cardImovel} >
-            <View style={styles.areaTituloCardImovel}>
-                <Text style={styles.tituloCardImovel}>Dados</Text>
+        <View style={styles.container} >
+
+            {/* Título */}
+            <View style={styles.areaTitulo}>
+                <Text style={styles.titulo}>Dados</Text>
             </View>
 
-            <View style={styles.areaConteudoCard}>
-                <Text style={styles.textoInfo}>
+            {/* Informações do imóvel */}
+            <View style={styles.areaConteudo}>
+                <Text style={styles.textoInformacao}>
                     <Text style={styles.bold}>Rua: </Text>
                     {imovel.rua}, {imovel.numero}
                 </Text>
 
-                {imovel.complemento ? <Text style={styles.textoInfo}>
+                {imovel.complemento ? <Text style={styles.textoInformacao}>
                     <Text style={styles.bold}>Complemento: </Text>
                     {imovel.complemento}
                 </Text> : null}
 
-                <Text style={styles.textoInfo}>
+                <Text style={styles.textoInformacao}>
                     <Text style={styles.bold}>Bairro: </Text>
                     {imovel.bairro}
                 </Text>
 
-                <Text style={styles.textoInfo}>
+                <Text style={styles.textoInformacao}>
                     <Text style={styles.bold}>Cidade/Estado: </Text>
                     {imovel.cidade} - {imovel.estado}
                 </Text>
 
-                <Text style={styles.textoInfo}>
+                <Text style={styles.textoInformacao}>
                     <Text style={styles.bold}>CEP: </Text>
                     {imovel.cep}
                 </Text>
@@ -56,31 +59,32 @@ export default function DadosImovelItem({ imovel }) {
                     />
                 </View>
 
+                {/* Informações do proprietário */}
                 {imovel.proprietario ? <View>
                     <View style={styles.linha} />
                     <Text style={styles.tituloProprietario}>Proprietário</Text>
 
-                    <Text style={styles.textoInfo}>
+                    <Text style={styles.textoInformacao}>
                         <Text style={styles.bold}>Nome: </Text>
                         {imovel.proprietario.nome}
                     </Text>
 
-                    <Text style={styles.textoInfo}>
+                    <Text style={styles.textoInformacao}>
                         <Text style={styles.bold}>CPF: </Text>
                         {imovel.proprietario.cpf}
                     </Text>
 
-                    <Text style={styles.textoInfo}>
+                    <Text style={styles.textoInformacao}>
                         <Text style={styles.bold}>Data de nascimento: </Text>
                         {imovel.proprietario.dataNascimento}
                     </Text>
 
-                    <Text style={styles.textoInfo}>
+                    <Text style={styles.textoInformacao}>
                         <Text style={styles.bold}>E-mail: </Text>
                         {imovel.proprietario.email}
                     </Text>
 
-                    <Text style={styles.textoInfo}>
+                    <Text style={styles.textoInformacao}>
                         <Text style={styles.bold}>Telefone: </Text>
                         {imovel.proprietario.telefone}
                     </Text>
@@ -104,7 +108,7 @@ export default function DadosImovelItem({ imovel }) {
 }
 
 const styles = StyleSheet.create({
-    cardImovel: {
+    container: {
         alignItems: 'center',
         borderWidth: 1,
         borderColor: COLORS.grey,
@@ -115,7 +119,7 @@ const styles = StyleSheet.create({
         paddingBottom: 15,
         marginBottom: 20
     },
-    areaTituloCardImovel: {
+    areaTitulo: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
@@ -132,12 +136,12 @@ const styles = StyleSheet.create({
         borderTopLeftRadius: 10,
         borderTopRightRadius: 10,
     },
-    tituloCardImovel: {
+    titulo: {
         fontSize: 20,
         fontWeight: 'bold',
         color: COLORS.darkBlue
     },
-    areaConteudoCard: {
+    areaConteudo: {
         padding: 15,
         width: '100%'
     },
@@ -146,7 +150,7 @@ const styles = StyleSheet.create({
         height: 100,
         borderRadius: 8
     },
-    areaTextoCard: {
+    areaTexto: {
         flex: 1,
         alignItems: 'flex-start',
     },
@@ -160,14 +164,13 @@ const styles = StyleSheet.create({
         color: COLORS.black,
         marginBottom: 4,
     },
-
     tipoImovel: {
         fontSize: 16,
         fontWeight: 'bold',
         color: COLORS.darkBlue,
         marginTop: 8,
     },
-    textoInfo: {
+    textoInformacao: {
         fontSize: 16,
         marginVertical: 2
     },

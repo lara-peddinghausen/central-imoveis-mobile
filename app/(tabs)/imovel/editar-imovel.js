@@ -129,22 +129,25 @@ export default function EditarImovel() {
 
     if (carregando) {
         return (
-            <View style={styles.loadingContainer}>
+            <View style={styles.areaLoading}>
                 <ActivityIndicator size="large" color={COLORS.darkBlue} />
-                <Text style={styles.loadingText}>Buscando dados do imóvel...</Text>
+                <Text style={styles.textoLoading}>Buscando dados do imóvel...</Text>
             </View>
         );
     }
 
     return (
         <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
-            <View style={styles.titleArea}>
-                <View style={styles.line} />
-                <Text style={styles.title}>Editar Imóvel</Text>
-                <View style={styles.line} />
+
+            {/* Título */}
+            <View style={styles.areaTitulo}>
+                <View style={styles.linha} />
+                <Text style={styles.titulo}>Editar Imóvel</Text>
+                <View style={styles.linha} />
             </View>
 
-            <View style={styles.formArea}>
+            {/* Formulário */}
+            <View style={styles.areaFormulario}>
                 <InputItem
                     label="Nome do Imóvel *"
                     placeholder="Ex: Apartamento no Centro"
@@ -177,9 +180,9 @@ export default function EditarImovel() {
                 <InputItem label="Cidade" value={cidade} editable={false} />
                 <InputItem label="Estado" value={estado} editable={false} />
 
-                <View style={styles.fieldContainer}>
-                    <Text style={styles.text}>Tipo de locação: *</Text>
-                    <View style={styles.checkBoxArea}>
+                <View style={styles.areaTipoStatus}>
+                    <Text style={styles.texto}>Tipo de locação: *</Text>
+                    <View style={styles.areaCheckBox}>
                         <CheckBox
                             label="Residencial"
                             isSelected={tipoLocacao === 'RESIDENCIAL'}
@@ -195,9 +198,10 @@ export default function EditarImovel() {
                     </View>
                 </View>
 
-                <View style={styles.fieldContainer}>
-                    <Text style={styles.text}>Status do Imóvel: *</Text>
-                    <View style={styles.checkBoxArea}>
+                {/* Status do imovel */}
+                <View style={styles.areaTipoStatus}>
+                    <Text style={styles.texto}>Status do Imóvel: *</Text>
+                    <View style={styles.areaCheckBox}>
                         <CheckBox
                             label="Disponível"
                             isSelected={status === 'DISPONIVEL'}
@@ -213,8 +217,9 @@ export default function EditarImovel() {
                     </View>
                 </View>
 
-                <View style={styles.imageArea}>
-                    <Text style={[styles.text, { alignSelf: 'flex-start', marginLeft: 5 }]}>Foto do Imóvel:</Text>
+                {/* Foto */}
+                <View style={styles.areaImg}>
+                    <Text style={[styles.texto, { alignSelf: 'flex-start', marginLeft: 5 }]}>Foto do Imóvel:</Text>
 
                     {foto ? (
                         <Image
@@ -226,7 +231,7 @@ export default function EditarImovel() {
                             resizeMode="cover"
                         />
                     ) : (
-                        <Text style={styles.semFotoText}>Nenhuma foto cadastrada para este imóvel.</Text>
+                        <Text style={styles.textoSemFoto}>Nenhuma foto cadastrada para este imóvel.</Text>
                     )}
 
                     <View
@@ -242,7 +247,8 @@ export default function EditarImovel() {
                 </View>
             </View>
 
-            <View style={styles.buttonArea}>
+            {/* Botões */}
+            <View style={styles.areaBotoes}>
                 {isEditable ? (
                     <>
                         <ButtonDark
@@ -290,34 +296,34 @@ const styles = StyleSheet.create({
         gap: 20,
         paddingBottom: 40,
     },
-    loadingContainer: {
+    areaLoading: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: COLORS.white
     },
-    loadingText: {
+    textoLoading: {
         marginTop: 10,
         color: COLORS.darkBlue,
         fontStyle: 'italic'
     },
-    titleArea: {
+    areaTitulo: {
         marginBottom: 20,
         flexDirection: 'row',
         alignItems: 'center',
     },
-    line: {
+    linha: {
         width: '25%',
         height: 2,
         backgroundColor: COLORS.darkBlue,
         marginHorizontal: 15,
     },
-    title: {
+    titulo: {
         fontSize: FONT_SIZE.xlarge,
         color: COLORS.darkBlue,
         fontWeight: 'bold',
     },
-    formArea: {
+    areaFormulario: {
         borderWidth: 1,
         borderColor: COLORS.grey,
         borderRadius: 10,
@@ -326,29 +332,29 @@ const styles = StyleSheet.create({
         paddingBottom: 20,
         paddingTop: 20
     },
-    fieldContainer: {
+    areaTipoStatus: {
         paddingHorizontal: 20,
         alignSelf: 'flex-start',
         marginVertical: 10,
         marginLeft: 15
     },
-    text: {
+    texto: {
         fontSize: FONT_SIZE.small,
         marginBottom: 10,
         color: COLORS.black,
     },
-    checkBoxArea: {
+    areaCheckBox: {
         flexDirection: 'row',
         gap: 10
     },
-    imageArea: {
+    areaImg: {
         width: '100%',
         paddingHorizontal: 20,
         marginTop: 15,
         alignItems: 'center',
         marginBottom: 10
     },
-    buttonArea: {
+    areaBotoes: {
         flexDirection: 'row',
         width: '90%',
         gap: 10,
@@ -362,7 +368,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: COLORS.grey,
     },
-    semFotoText: {
+    textoSemFoto: {
         fontSize: FONT_SIZE.small,
         color: COLORS.grey,
         fontStyle: 'italic',

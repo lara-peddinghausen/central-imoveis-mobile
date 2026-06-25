@@ -18,12 +18,11 @@ export default function InputItem({
     const [mostrarSenha, setMostrarSenha] = useState(false);
 
     return (
-        <View style={styles.wrapper}>
+        <View style={styles.container}>
 
-            <Text style={styles.text}> {label} </Text>
+            <Text style={styles.texto}> {label} </Text>
 
-
-            <View style={[styles.container, error && styles.containerError, !editable && styles.containerDisabled]}>
+            <View style={[styles.areaInput, error && styles.areaErro, !editable && styles.containerDisabled]}>
 
                 <TextInput
                     style={[styles.input, !editable && styles.inputDisabled]}
@@ -52,7 +51,6 @@ export default function InputItem({
 
             </View>
 
-
         </View>
 
     );
@@ -60,12 +58,11 @@ export default function InputItem({
 }
 
 const styles = StyleSheet.create({
-    wrapper: {
+    container: {
         marginBottom: 10,
         width: '90%',
-        // alignItems: 'center'
     },
-    text: {
+    texto: {
         alignSelf: 'flex-start',
         marginLeft: 5,
         marginTop: 5,
@@ -73,7 +70,7 @@ const styles = StyleSheet.create({
         color: COLORS.black,
 
     },
-    container: {
+    areaInput: {
         flexDirection: 'row',
         alignItems: 'center',
         borderWidth: 1,
@@ -81,10 +78,9 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         paddingHorizontal: 15, 
         height: 45,
-        width: '100%',
-        // paddingTop: 3,
+        width: '100%'
     },
-    containerError: {
+    areaErro: {
         borderColor: COLORS.red,
         borderWidth: 2
     },
@@ -93,12 +89,8 @@ const styles = StyleSheet.create({
         backgroundColor: '#F9F9F9' 
     },
     input: {
-        // width: 250,
         height: '100%',
         flex: 1,
-        // borderWidth: 1,
-        // borderRadius: 5,
-        // margin: 10,
         fontSize: FONT_SIZE.small,
         paddingRight: 10,
         color: COLORS.black,

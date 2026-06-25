@@ -11,10 +11,10 @@ export default function CheckBox({ label, isSelected, onPress, disabled = false 
       activeOpacity={disabled ? 1 : 0.7}
       disabled={disabled}
     >
-      <View style={[styles.box, isSelected && styles.selectedBox, disabled && styles.disabledBox]}>
-        {isSelected && <View style={[styles.filled, disabled && styles.disabledFilled]} />}
+      <View style={[styles.caixa, isSelected && styles.caixaSelecionada, disabled && styles.caixaDisabled]}>
+        {isSelected && <View style={[styles.preenchido, disabled && styles.preenchidoDisable]} />}
       </View>
-      <Text style={[styles.label, disabled && styles.disabledLabel]}>{label}</Text>
+      <Text style={[styles.label, disabled && styles.labelDisabled]}>{label}</Text>
     </TouchableOpacity>
   );
 }
@@ -28,7 +28,7 @@ const styles = StyleSheet.create({
   disabledContainer: {
     opacity: 0.5, 
   },
-  box: { width: 22, 
+  caixa: { width: 22, 
     height: 22, 
     borderWidth: 1.5, 
     borderColor: COLORS.lightGrey, 
@@ -36,19 +36,19 @@ const styles = StyleSheet.create({
     justifyContent: 'center', 
     alignItems: 'center' 
   },
-  disabledBox: {
+  caixaDisabled: {
     borderColor: COLORS.grey,
   },
-  selectedBox: { 
+  caixaSelecionada: { 
     borderColor: COLORS.lightBlue 
   },
-  filled: { 
+  preenchido: { 
     width: 12, 
     height: 12, 
     backgroundColor: COLORS.lightBlue, 
     borderRadius: 3 
   },
-  disabledFilled: {
+  preenchidoDisable: {
     backgroundColor: COLORS.grey, 
   },
   label: { 
@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
     marginLeft: 10, 
     color: COLORS.black 
   },
-  disabledLabel: {
+  labelDisabled: {
     color: COLORS.grey, 
   },
 });

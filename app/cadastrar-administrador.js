@@ -72,19 +72,22 @@ export default function CadastroAdministrador() {
     };
 
     const cancelar = () => {
-        router.back(); // Volta para a tela anterior (Login) aproveitando a pilha do Stack
+        router.back(); 
     };
 
     return (
         <ScrollView contentContainerStyle={styles.container}>
-            <View style={styles.titleArea}>
-                <View style={styles.line} />
-                <Text style={styles.title}>Cadastro</Text>
-                <View style={styles.line} />
+
+            {/* Título */}
+            <View style={styles.areaTitulo}>
+                <View style={styles.linha} />
+                <Text style={styles.titulo}>Cadastro</Text>
+                <View style={styles.linha} />
             </View>
 
-            <View style={styles.formArea}>
-                <Text style={styles.subtitleArea}>Preencha seu cadastro</Text>
+            {/* Formulário */}
+            <View style={styles.areaFormulario}>
+                <Text style={styles.areaSubtitulo}>Preencha seu cadastro</Text>
                 <InputItem
                     label='Nome *'
                     placeholder='Insira seu nome'
@@ -142,10 +145,10 @@ export default function CadastroAdministrador() {
                 />
             </View>
 
-            <Text style={styles.requiredText}>* Campos obrigatórios</Text>
+            <Text style={styles.textoObrigatorio}>* Campos obrigatórios</Text>
 
-            <View style={styles.buttonsArea}>
-
+            {/* Botões */}
+            <View style={styles.areaBotoes}>
                 <ButtonLight title="Cancelar"
                     onPress={cancelar}
                     flex
@@ -172,23 +175,23 @@ const styles = StyleSheet.create({
         gap: 20,
         paddingVertical: 30
     },
-    line: {
+    linha: {
         width: '30%',
         height: 2,
         backgroundColor: COLORS.darkBlue,
         marginHorizontal: 10
     },
-    titleArea: {
+    areaTitulo: {
         flexDirection: 'row',
         alignItems: 'center',
 
     },
-    title: {
+    titulo: {
         fontSize: FONT_SIZE.xlarge,
         fontWeight: 'bold',
         color: COLORS.darkBlue
     },
-    formArea: {
+    areaFormulario: {
         alignItems: 'center',
         width: '90%',
         borderWidth: 1,
@@ -198,20 +201,20 @@ const styles = StyleSheet.create({
         gap: 5
 
     },
-    subtitleArea: {
+    areaSubtitulo: {
         fontSize: FONT_SIZE.medium,
         fontWeight: '500',
         color: COLORS.black,
         marginBottom: 10,
     },
-    requiredText: {
+    textoObrigatorio: {
         marginTop: 10,
         alignSelf: 'flex-start',
         marginLeft: 5,
         fontStyle: 'italic',
         color: COLORS.red
     },
-    buttonsArea: {
+    areaBotoes: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         width: '90%',

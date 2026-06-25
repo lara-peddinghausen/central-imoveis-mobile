@@ -159,14 +159,17 @@ async function buscarCepAutomatico(cepDigitado) {
             contentContainerStyle={styles.container}
             showsVerticalScrollIndicator={false}
         >
-            <View style={styles.titleArea} >
-                <View style={styles.line} />
-                <Text style={styles.title}>Cadastrar Imóvel</Text>
-                <View style={styles.line} />
+
+            {/* Título */}
+            <View style={styles.areaTitulo} >
+                <View style={styles.linha} />
+                <Text style={styles.titulo}>Cadastrar Imóvel</Text>
+                <View style={styles.linha} />
             </View>
 
-            <View style={styles.formArea}>
-                <Text style={styles.formTitle}> Preencha os dados do imóvel </Text>
+            {/* Formulário */}
+            <View style={styles.areaFormulario}>
+                <Text style={styles.tituloFormulario}> Preencha os dados do imóvel </Text>
 
                 <InputItem
                     label='Nome do Imóvel *'
@@ -237,9 +240,10 @@ async function buscarCepAutomatico(cepDigitado) {
                     error={submitted && !estado.trim()}
                 />
 
-                <View style={styles.fieldContainer}>
-                    <Text style={styles.text}>Tipo de locação: *</Text>
-                    <View style={styles.checkBoxArea}>
+                {/* Tipo de locação */}
+                <View style={styles.areaTipo}>
+                    <Text style={styles.texto}>Tipo de locação: *</Text>
+                    <View style={styles.areaCheckBox}>
                         <CheckBox
                             label="Residencial"
                             isSelected={tipoLocacao === 'RESIDENCIAL'}
@@ -253,16 +257,18 @@ async function buscarCepAutomatico(cepDigitado) {
                     </View>
                 </View>
 
-                <View style={styles.imageArea}>
+                {/* Foto */}
+                <View style={styles.areaImg}>
                     <ImageSelector textoBtn = "+ Adicionar imagem" onImageSelected={(uri) => setFoto(uri)} />
                 </View>
             </View>
 
-            <View style={styles.alertArea}>
-                <Text style={styles.alertText}>* Campos obrigatórios</Text>
+            <View style={styles.areaAlert}>
+                <Text style={styles.textoAlert}>* Campos obrigatórios</Text>
             </View>
 
-            <View style={styles.buttonArea}>
+            {/* Botões */}
+            <View style={styles.areaBotoes}>
                 <ButtonDark title={salvando ? 'Salvando Imóvel...' : 'Cadastrar Imóvel'} onPress={cadastrar} disabled={salvando} flex />
                 <ButtonLight title="Cancelar" onPress={() => router.replace('/home')} flex />
             </View>
@@ -282,23 +288,23 @@ const styles = StyleSheet.create({
         gap: 20,
         paddingVertical: 20
     },
-    titleArea: {
+    areaTitulo: {
         marginBottom: 20,
         flexDirection: 'row',
         alignItems: 'center',
     },
-    line: {
+    linha: {
         width: '25%',
         height: 2,
         backgroundColor: COLORS.darkBlue,
         marginHorizontal: 15,
     },
-    title: {
+    titulo: {
         fontSize: FONT_SIZE.xlarge,
         color: COLORS.darkBlue,
         fontWeight: 'bold',
     },
-    formArea: {
+    areaFormulario: {
         borderWidth: 1,
         borderColor: COLORS.grey,
         borderRadius: 10,
@@ -306,41 +312,41 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingBottom: 15,
     },
-    formTitle: {
+    tituloFormulario: {
         fontSize: FONT_SIZE.large,
         color: COLORS.darkBlue,
         fontWeight: 'bold',
         marginVertical: 15,
     },
-    fieldContainer: {
+    areaTipo: {
         padding: 20,
         alignSelf: 'flex-start',
         marginVertical: 10,
         marginLeft: 15
     },
-    text: {
+    texto: {
         fontSize: FONT_SIZE.small,
         marginBottom: 10,
         color: COLORS.black,
     },
-    checkBoxArea: {
+    areaCheckBox: {
         flexDirection: 'row',
     },
-    imageArea: {
+    areaImg: {
         width: '100%',
         paddingHorizontal: 20,
         marginTop: 10,
         alignItems: 'center'
     },
-    alertArea: {
+    areaAlert: {
         alignSelf: 'flex-start',
         marginLeft: 20
     },
-    alertText: {
+    textoAlert: {
         fontStyle: 'italic',
         color: COLORS.red,
     },
-    buttonArea: {
+    areaBotoes: {
         flexDirection: 'row'
     }
 });

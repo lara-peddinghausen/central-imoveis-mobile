@@ -33,17 +33,18 @@ export default function ImageSelector({ onImageSelected, textoBtn }) {
     setPreviewUri(null);
     onImageSelected(null); // Avisa a tela de cadastro que a imagem foi removida
   };
+
   return (
     <View style={styles.container}>
       <TouchableOpacity onPress={selecionarImagem} activeOpacity={0.7}>
-        <Text style={styles.linkText}>{textoBtn}</Text>
+        <Text style={styles.textoLink}>{textoBtn}</Text>
       </TouchableOpacity>
 
       {previewUri && (
-        <View style={styles.previewContainer}>
-          <Image source={{ uri: previewUri }} style={styles.previewImage} />
+        <View style={styles.areaPreview}>
+          <Image source={{ uri: previewUri }} style={styles.imgPreview} />
           <TouchableOpacity onPress={removerImagem}>
-            <Text style={styles.removeText}>Remover imagem</Text>
+            <Text style={styles.textoRemoveImg}>Remover imagem</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -53,27 +54,26 @@ export default function ImageSelector({ onImageSelected, textoBtn }) {
 
 const styles = StyleSheet.create({
   container: { 
-    marginTop: 10,
-
+    marginTop: 10
 },
-  linkText: { 
+  textoLink: { 
     fontSize: FONT_SIZE.medium, 
     color: COLORS.darkBlue, 
     textDecorationLine: 'underline',
 
 },
-  previewContainer: { 
+  areaPreview: { 
     marginTop: 15, 
     alignItems: 'flex-start' 
 },
-  previewImage: { 
+  imgPreview: { 
     width: 120, 
     height: 90, 
     borderRadius: 8, 
     borderWidth: 1, 
     borderColor: COLORS.lightGrey 
 },
-  removeText: { 
+  textoRemoveImg: { 
     color: COLORS.red, 
     marginTop: 5, 
     fontSize: 14 

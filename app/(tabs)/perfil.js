@@ -44,7 +44,7 @@ export default function Perfil() {
         }
     }, [user]);
 
-    // Ação de Logout
+    // Logout
     const handleLogout = async () => {
         await AsyncStorage.removeItem('usuario');
         router.replace('/login');
@@ -71,7 +71,7 @@ export default function Perfil() {
 
             if (resposta.status === 200 || resposta.status === 204) {
                 Alert.alert('Sucesso', 'Perfil atualizado com sucesso!');
-                setIsEditable(false); // Tranca os inputs novamente
+                setIsEditable(false); // Bloqueia os inputs novamente
 
                 if (atualizarDadosUser) {
                     // Atualiza o contexto global do App
@@ -89,13 +89,16 @@ export default function Perfil() {
             contentContainerStyle={styles.container}
             showsVerticalScrollIndicator={false}
         >
-            <View style={styles.titleArea} >
-                <View style={styles.line} />
-                <Text style={styles.title}>Meu perfil</Text>
-                <View style={styles.line} />
+
+            {/* Título */}
+            <View style={styles.areaTitulo} >
+                <View style={styles.linha} />
+                <Text style={styles.titulo}>Meu perfil</Text>
+                <View style={styles.linha} />
             </View>
 
-            <View style={styles.formArea}>
+            {/* Formulário */}
+            <View style={styles.areaFormulario}>
                 <InputItem
                     label='Nome'
                     placeholder='Seu nome completo'
@@ -132,7 +135,8 @@ export default function Perfil() {
                 />
             </View>
 
-            <View style={styles.buttonArea}>
+            {/* Botões */}
+            <View style={styles.areaBotoes}>
                 {isEditable ? (
                     <>
                         <ButtonDark
@@ -182,23 +186,23 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         gap: 20,
     },
-    titleArea: {
+    areaTitulo: {
         marginBottom: 20,
         flexDirection: 'row',
         alignItems: 'center',
     },
-    line: {
+    linha: {
         width: '40%',
         height: 2,
         backgroundColor: COLORS.darkBlue,
         marginHorizontal: 20,
     },
-    title: {
+    titulo: {
         fontSize: FONT_SIZE.xlarge,
         color: COLORS.darkBlue,
         fontWeight: 'bold',
     },
-    formArea: {
+    areaFormulario: {
         borderWidth: 1,
         borderColor: COLORS.grey,
         borderRadius: 10,
@@ -206,7 +210,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingBottom: 15,
     },
-    buttonArea: {
+    areaBotoes: {
         flexDirection: 'row',
         width: '90%',
         gap: 15,

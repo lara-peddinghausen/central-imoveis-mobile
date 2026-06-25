@@ -134,6 +134,8 @@ export default function Home() {
             contentContainerStyle={styles.container}
             showsVerticalScrollIndicator={false}
         >
+
+            {/* Titulo */}
             <Image
                 source={require('../../src/assets/images/logo4.png')}
                 style={styles.textoLogo}
@@ -142,18 +144,19 @@ export default function Home() {
             <View style={styles.linha} />
 
             <View style={styles.areaLogo}>
+                {/* Logo */}
                 <Image
                     source={require('../../src/assets/images/logo3.png')}
                     style={styles.logo}
                 />
                 <View style={{ gap: 10 }}>
-                    {/* Bloco: Total de Imóveis */}
+                    {/* Total de Imóveis */}
                     <View style={styles.areaTextoNumeros}>
                         <Text style={{ fontSize: 16 }}>Total de Imóveis</Text>
                         <Text style={styles.textoNumeros}>{totalImoveis}</Text>
                     </View>
 
-                    {/* Bloco: Alugados */}
+                    {/* Alugados */}
                     <View style={styles.areaTextoNumeros}>
                         <View style={styles.areaEsquerda}>
                             <IconAlugado />
@@ -162,7 +165,7 @@ export default function Home() {
                         <Text style={styles.textoNumeros}>{imoveisAlugados}</Text>
                     </View>
 
-                    {/* Bloco: Disponíveis */}
+                    {/* Disponíveis */}
                     <View style={styles.areaTextoNumeros}>
                         <View style={styles.areaEsquerda}>
                             <IconDisponivel />
@@ -175,12 +178,13 @@ export default function Home() {
 
             <View style={styles.linha} />
 
+            {/* Filtro */}
             <Dropdown
                 style={styles.dropdown}
                 placeholderStyle={styles.placeholderStyle}
                 selectedTextStyle={styles.selectedTextStyle}
-                containerStyle={styles.menuContainer}
-                itemTextStyle={styles.itemTextStyle}
+                containerStyle={styles.areaMenu}
+                itemTextStyle={styles.textoItem}
                 activeColor={COLORS.babyBlue}
                 iconColor={COLORS.darkBlue}
                 data={dadosDropdown}
@@ -193,8 +197,9 @@ export default function Home() {
                 }}
             />
 
+            {/* Imoveis cadastrados */}
             {filteredProperties.length === 0 ? (
-                <Text style={styles.emptyText}>Nenhum imóvel encontrado.</Text>
+                <Text style={styles.textoVazio}>Nenhum imóvel encontrado.</Text>
             ) : (
                 filteredProperties.map((item, index) => (
                     <ImovelItem
@@ -278,7 +283,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 12,
         backgroundColor: COLORS.white,
     },
-    menuContainer: {
+    areaMenu: {
         borderRadius: 10,
         borderTopLeftRadius: 10,
         borderTopRightRadius: 10,
@@ -293,11 +298,11 @@ const styles = StyleSheet.create({
         backgroundColor: COLORS.white,
         overflow: 'hidden',
     },
-    itemTextStyle: {
+    textoItem: {
         fontSize: 16,
         color: COLORS.black,
     },
-    emptyText: {
+    textoVazio: {
         fontSize: 16,
         color: COLORS.grey,
         fontStyle: 'italic',
