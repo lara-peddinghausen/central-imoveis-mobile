@@ -24,6 +24,9 @@ export default function CadastrarInquilino() {
     const [dataNascimento, setDataNascimento] = useState('');
 
     const salvarInquilino = async () => {
+
+        Alert.alert("Teste de Clique", "A função salvarInquilino começou a rodar!");
+
         if (salvando) return;
         setSubmitted(true);
 
@@ -51,6 +54,13 @@ export default function CadastrarInquilino() {
             // Cria a Pessoa/Inquilino no Backend
             const respostaPessoa = await api.post('/pessoa', dadosPessoa);
 
+            // Captura o ID gerado pelo banco de dados
+            const pessoaIdGerada = respostaPessoa.data?.id;
+
+            console.log("=== DIAGNÓSTICO DE VÍNCULO ===");
+            console.log("locacaoId:", locacaoId);
+            console.log("pessoaIdGerada:", pessoaIdGerada);
+
             // 2. Só tenta fazer o PUT se os dois IDs existirem de verdade
             if (locacaoId && pessoaIdGerada) {
 
@@ -59,11 +69,10 @@ export default function CadastrarInquilino() {
                     pessoa: Number(pessoaIdGerada)
                 };
 
-                console.log("🚀 Enviando para o PUT /locacao:", payload);
+                console.log("Enviando para o PUT /locacao:", payload);
 
                 await api.put('/locacao', payload);
 
-                // 🚀 ALERTA CORRIGIDO: Agora avisa e volta direto para a tela do Imóvel específico!
                 Alert.alert('Sucesso!', 'Inquilino cadastrado e vinculado ao contrato com sucesso!', [
                     {
                         text: 'OK',
@@ -71,6 +80,9 @@ export default function CadastrarInquilino() {
                     }
                 ]);
 
+            } else {
+                console.warn("⚠️ Não foi possível vincular: IDs ausentes.");
+                Alert.alert('Atenção', 'Inquilino criado, mas não foi possível vinculá-lo ao contrato.');
             }
 
         } catch (error) {
