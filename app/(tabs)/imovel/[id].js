@@ -7,6 +7,7 @@ import { IconAlugado, IconContrato, IconDisponivel } from '../../../src/componen
 import { FONT_SIZE } from '../../../src/theme/typography';
 import DadosImovelItem from '../../../src/components/DadosImovelItem';
 import ButtonLocacao from '../../../src/components/ButtonLocacao';
+import DadosLocacaoItem from '../../../src/components/DadosLocacaoItem';
 
 
 export default function DetalhesImovel() {
@@ -14,6 +15,7 @@ export default function DetalhesImovel() {
     const { id } = useLocalSearchParams();
 
     const [imovel, setImovel] = useState(null);
+    const [locacao, setLocacao] = useState(null);
     const [carregando, setCarregando] = useState(true);
 
     const BASE_URL = 'http://10.0.2.2:8080';
@@ -23,8 +25,24 @@ export default function DetalhesImovel() {
             async function buscarDadosDoBanco() {
                 try {
                     // Busca segura e autenticada direta do Spring Boot usando o ID
-                    const response = await api.get(`/imovel/${id}`);
-                    setImovel(response.data);
+                    const responseImovel = await api.get(`/imovel/${id}`);
+                    setImovel(responseImovel.data);
+
+                    // 2. Se o imóvel estiver ALUGADO, busca o contrato ativo dele no backend
+                    if (responseImovel.data.status === 'ALUGADO') {
+                        try {
+                            // Certifique-se de ter um endpoint no Java como "/locacao/imovel/{id}" 
+                            // ou trate buscando da sua listagem passando o ID do imóvel.
+                            const responseLocacao = await api.get(`/locacao/imovel/${id}`);
+                            setLocacao(responseLocacao.data);
+                        } catch (locError) {
+                            console.warn("Contrato não encontrado para este imóvel alugado:", locError.message);
+                            setLocacao(null);
+                        }
+                    } else {
+                        setLocacao(null); // Se está disponível, limpa qualquer estado anterior
+                    }
+
                 } catch (error) {
                     console.error("Erro ao buscar detalhes:", error.message);
                     Alert.alert('Erro', 'Não foi possível carregar os dados atualizados deste imóvel.');
@@ -95,6 +113,9 @@ export default function DetalhesImovel() {
                         </View>)}
                 </Text>
             </View>
+
+            {/* Card com dados da locação */}
+            <DadosLocacaoItem locacao={locacao} imovelId={imovel.id} />
 
             {/* Card com dados do imóvel */}
             <DadosImovelItem imovel={imovel} />
