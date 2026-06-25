@@ -53,7 +53,7 @@ export default function CadastrarLocacao() {
                 dataTermino: dataTermino.trim(), // Espera o formato "dd/mm/aaaa"
                 aluguel: parseFloat(aluguelLimpo),
                 observacao: observacao.trim(),
-                imovelId: imovelId ? parseInt(imovelId) : null // Passa o ID do imóvel
+                imovel: imovelId ? parseInt(imovelId) : null // Passa o ID do imóvel
             };
 
             // Salva a locação vinculada ao imóvel
@@ -99,13 +99,15 @@ export default function CadastrarLocacao() {
             contentContainerStyle={styles.container}
             showsVerticalScrollIndicator={false}
         >
-            <View style={styles.titleArea} >
-                <View style={styles.line} />
-                <Text style={styles.title}>Locação</Text>
-                <View style={styles.line} />
+            {/* Área do título */}
+            <View style={styles.areaTitulo} >
+                <View style={styles.linha} />
+                <Text style={styles.titulo}>Locação</Text>
+                <View style={styles.linha} />
             </View>
 
-            <View style={styles.formArea}>
+            {/* Formulário */}
+            <View style={styles.areaFormulario}>
                 <Text style={styles.formTitle}> Dados do Contrato </Text>
 
                 <InputItem
@@ -150,11 +152,12 @@ export default function CadastrarLocacao() {
                 />
             </View>
 
-            <View style={styles.alertArea}>
-                <Text style={styles.alertText}>* Campos obrigatórios</Text>
+            <View style={styles.areaAlert}>
+                <Text style={styles.textoAlert}>* Campos obrigatórios</Text>
             </View>
 
-            <View style={styles.buttonArea}>
+            {/* Botões */}
+            <View style={styles.areaBotoes}>
                 <ButtonDark title={salvando ? "Salvando..." : "Cadastrar"} onPress={cadastrar} disabled={salvando} flex />
                 <ButtonLight title="Cancelar" onPress={() => router.replace(`/imovel/${imovelId}`)} flex />
             </View>
@@ -173,23 +176,23 @@ const styles = StyleSheet.create({
         gap: 20,
         paddingVertical: 20
     },
-    titleArea: {
+    areaTitulo: {
         marginBottom: 20,
         flexDirection: 'row',
         alignItems: 'center',
     },
-    line: {
+    linha: {
         width: '25%',
         height: 2,
         backgroundColor: COLORS.darkBlue,
         marginHorizontal: 15,
     },
-    title: {
+    titulo: {
         fontSize: FONT_SIZE.xlarge,
         color: COLORS.darkBlue,
         fontWeight: 'bold',
     },
-    formArea: {
+    areaFormulario: {
         borderWidth: 1,
         borderColor: COLORS.grey,
         borderRadius: 10,
@@ -203,15 +206,15 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         marginVertical: 15,
     },
-    alertArea: {
+    areaAlert: {
         alignSelf: 'flex-start',
         marginLeft: 20
     },
-    alertText: {
+    textoAlert: {
         fontStyle: 'italic',
         color: COLORS.red,
     },
-    buttonArea: {
+    areaBotoes: {
         flexDirection: 'row',
         width: '90%',
         gap: 15
