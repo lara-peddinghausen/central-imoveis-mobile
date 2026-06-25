@@ -74,7 +74,7 @@ export default function CadastrarLocacao() {
                         {
                             text: 'Sim, cadastrar inquilino',
                             // Envia o id da locação gerada para a próxima tela fazer o vínculo
-                            onPress: () => router.replace(`/pessoa/cadastrar-pessoa?locacaoId=${locacaoIdGerado}&imovelId=${imovelId}`),
+                            onPress: () => router.replace(`/inquilino/cadastrar-inquilino?locacaoId=${locacaoIdGerado}&imovelId=${imovelId}`),
                             style: 'default'
                         }
                     ],
