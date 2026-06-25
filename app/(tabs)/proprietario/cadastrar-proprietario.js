@@ -26,10 +26,7 @@ export default function CadastrarProprietario() {
 
     const camposObrigatoriosInvalidos =
         !nome.trim() ||
-        !cpf.trim() ||
-        !dataNascimento.trim() ||
-        !telefone.trim() ||
-        !email.trim();
+        !cpf.trim();
 
     if (camposObrigatoriosInvalidos) {
         Alert.alert('Campos Obrigatórios', 'Preencha todos os campos obrigatórios (*)');
@@ -116,7 +113,7 @@ export default function CadastrarProprietario() {
                 <Text style={styles.formTitle}> Dados do Proprietário </Text>
 
                 <InputItem
-                    label='Nome completo *'
+                    label='Nome *'
                     placeholder='Digite o nome do proprietário'
                     value={nome}
                     onChangeText={(texto) => setNome(texto)}
@@ -134,30 +131,24 @@ export default function CadastrarProprietario() {
                     error={submitted && !cpf.trim()}
                 />
                 <InputItem
-                    label='Telefone *'
+                    label='Telefone'
                     placeholder='(xx) xxxxx-xxxx'
                     value={telefone}
                     keyboardType='phone-pad'
                     onChangeText={(texto) => setTelefone(texto)}
-                    isRequired
-                    error={submitted && !telefone.trim()}
                 />
                 <InputItem
-                    label='E-mail *'
+                    label='E-mail'
                     placeholder='email@email.com'
                     value={email}
                     keyboardType='email-address'
                     onChangeText={(texto) => setEmail(texto)}
-                    isRequired
-                    error={submitted && !email.trim()}
                 />
                 <InputItem
-                    label='Data de nascimento*'
+                    label='Data de nascimento'
                     placeholder='Formato: dd/mm/aaaa'
                     value={dataNascimento}
                     onChangeText={(texto) => setDataNascimento(texto)}
-                    isRequired
-                    error={submitted && !dataNascimento.trim()}
                 />
             </View>
 
