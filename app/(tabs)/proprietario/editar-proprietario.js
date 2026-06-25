@@ -61,10 +61,7 @@ export default function EditarProprietario() {
         setSubmitted(true);
 
         const camposInvalidos =
-            !nome.trim() ||
-            !dataNascimento.trim() ||
-            !telefone.trim() ||
-            !email.trim();
+            !nome.trim();
 
         if (camposInvalidos) {
             Alert.alert('Campos Obrigatórios', 'Preencha todos os campos obrigatórios (*)');
@@ -132,36 +129,30 @@ export default function EditarProprietario() {
                 <InputItem label='CPF *' value={cpf} editable={false} />
 
                 <InputItem
-                    label='Telefone *'
+                    label='Telefone'
                     placeholder='(xx) xxxxx-xxxx'
                     value={telefone}
                     keyboardType='phone-pad'
                     onChangeText={setTelefone}
                     editable={isEditable}
                     disabled={!isEditable}
-                    isRequired
-                    error={submitted && !telefone.trim()}
                 />
                 <InputItem
-                    label='E-mail *'
+                    label='E-mail'
                     placeholder='email@email.com'
                     value={email}
                     keyboardType='email-address'
                     onChangeText={setEmail}
                     editable={isEditable}
                     disabled={!isEditable}
-                    isRequired
-                    error={submitted && !email.trim()}
                 />
                 <InputItem
-                    label='Data de nascimento *'
+                    label='Data de nascimento'
                     placeholder='Formato: dd/mm/aaaa'
                     value={dataNascimento}
                     onChangeText={setDataNascimento}
                     editable={isEditable}
                     disabled={!isEditable}
-                    isRequired
-                    error={submitted && !dataNascimento.trim()}
                 />
             </View>
 
