@@ -93,7 +93,8 @@ const styles = StyleSheet.create({
     tituloCardImovel: {
         fontSize: 20,
         fontWeight: 'bold',
-        color: COLORS.darkBlue
+        color: COLORS.darkBlue,
+        marginLeft: -30
     },
     areaConteudoCard: {
         flexDirection: 'row',
