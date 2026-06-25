@@ -94,8 +94,8 @@ export default function Home() {
         navigation.setOptions({
             title: `Olá, ${nomeUsuario || 'Usuário'}!`,
             headerStyle: {
-                backgroundColor: COLORS.darkBlue, 
-                height: 90, 
+                backgroundColor: COLORS.darkBlue,
+                height: 90,
             },
             headerTitleStyle: {
                 fontSize: FONT_SIZE.xlarge,
@@ -147,20 +147,27 @@ export default function Home() {
                     style={styles.logo}
                 />
                 <View style={{ gap: 10 }}>
+                    {/* Bloco: Total de Imóveis */}
                     <View style={styles.areaTextoNumeros}>
-                        <Text style={styles.textoNumeros}>Total de Imóveis</Text>
+                        <Text style={{ fontSize: 16 }}>Total de Imóveis</Text>
                         <Text style={styles.textoNumeros}>{totalImoveis}</Text>
                     </View>
 
+                    {/* Bloco: Alugados */}
                     <View style={styles.areaTextoNumeros}>
-                        <IconAlugado />
-                        <Text style={styles.textoNumeros}>Alugados</Text>
+                        <View style={styles.areaEsquerda}>
+                            <IconAlugado />
+                            <Text style={{ fontSize: 16 }}>Alugados</Text>
+                        </View>
                         <Text style={styles.textoNumeros}>{imoveisAlugados}</Text>
                     </View>
 
+                    {/* Bloco: Disponíveis */}
                     <View style={styles.areaTextoNumeros}>
-                        <IconDisponivel />
-                        <Text style={styles.textoNumeros}>Disponíveis</Text>
+                        <View style={styles.areaEsquerda}>
+                            <IconDisponivel />
+                            <Text style={{ fontSize: 16 }}>Disponíveis</Text>
+                        </View>
                         <Text style={styles.textoNumeros}>{imoveisDisponiveis}</Text>
                     </View>
                 </View>
@@ -238,15 +245,15 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: COLORS.darkBlue,
         borderRadius: 10,
-        padding: 8,
+        paddingHorizontal: 12,
         flexDirection: 'row',
-        justifyContent: 'space-between',
         alignItems: 'center',
-        gap: 15,
+        justifyContent: 'space-between',
+        width: 180,
         height: 40
     },
     textoNumeros: {
-        fontSize: 16,
+        fontSize: 16
     },
     vetor: {
         width: 20,
@@ -296,5 +303,15 @@ const styles = StyleSheet.create({
         fontStyle: 'italic',
         textAlign: 'center',
         marginTop: 20,
-    }
+    },
+    texto: {
+        flex: 1,
+        fontSize: 16,
+        marginLeft: 10
+    },
+    areaEsquerda: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 10,
+    },
 });
