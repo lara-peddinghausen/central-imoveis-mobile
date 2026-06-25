@@ -5,7 +5,7 @@ import { api } from '../../../src/services/api';
 import { COLORS } from '../../../src/theme/colors';
 import { IconAlugado, IconContrato, IconDisponivel } from '../../../src/components/Icons';
 import { FONT_SIZE } from '../../../src/theme/typography';
-import DataItem from '../../../src/components/DataItem';
+import DadosImovelItem from '../../../src/components/DadosImovelItem';
 import ButtonLocacao from '../../../src/components/ButtonLocacao';
 
 
@@ -42,9 +42,9 @@ export default function DetalhesImovel() {
     // Loading na tela
     if (carregando) {
         return (
-            <View style={styles.loadingContainer}>
+            <View style={styles.areaLoading}>
                 <ActivityIndicator size="large" color={COLORS.darkBlue} />
-                <Text style={styles.loadingText}>Carregando dados protegidos...</Text>
+                <Text style={styles.textoLoading}>Carregando dados protegidos...</Text>
             </View>
         );
     }
@@ -52,45 +52,56 @@ export default function DetalhesImovel() {
     // Se o imóvel não for encontrado
     if (!imovel) {
         return (
-            <View style={styles.loadingContainer}>
-                <Text style={styles.loadingText}>Imóvel não encontrado.</Text>
+            <View style={styles.areaLoading}>
+                <Text style={styles.textoLoading}>Imóvel não encontrado.</Text>
             </View>
         );
     }
 
     return (
         <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
-            <View style={styles.line} />
+            <View style={styles.linha} />
+
+            {/* Header */}
             <View style={styles.header}>
                 <Image
                     source={imovel.fotoUrl ? { uri: `${BASE_URL}${imovel.fotoUrl}` } : require('../../../src/assets/images/logo3.png')}
                     style={styles.img}
                 />
-                <View style={styles.textHeader}>
+                <View style={styles.textoHeader}>
                     <Text style={styles.tituloImovel}>{imovel.nome}</Text>
-                    <Text style={styles.subtitulo}>{imovel.tipoLocacao ? imovel.tipoLocacao.toLowerCase() : ''}</Text>
+
+                    <Text style={styles.subtitulo}>
+                        {imovel.tipoLocacao
+                            ? imovel.tipoLocacao.charAt(0).toUpperCase() + imovel.tipoLocacao.slice(1).toLowerCase()
+                            : ''}
+                    </Text>
                 </View>
             </View>
-            <View style={styles.line} />
 
+            <View style={styles.linha} />
+
+            {/* Banner */}
             <View style={[styles.statusBanner, { backgroundColor: imovel.status === 'ALUGADO' ? COLORS.yellowCDI : COLORS.green }]}>
                 <Text>
                     {imovel.status === 'ALUGADO' ?
                         (<View style={styles.areaStatus}>
                             <IconAlugado color={COLORS.darkBlue} />
-                            <Text style={styles.statusText}>Alugado</Text>
+                            <Text style={styles.textoStatus}>Alugado</Text>
                         </View>) :
                         (<View style={styles.areaStatus}>
                             <IconDisponivel color={COLORS.darkBlue} />
-                            <Text style={styles.statusText}>Disponível</Text>
+                            <Text style={styles.textoStatus}>Disponível</Text>
                         </View>)}
                 </Text>
             </View>
 
-            <DataItem imovel={imovel} />
+            {/* Card com dados do imóvel */}
+            <DadosImovelItem imovel={imovel} />
 
-            <View style={styles.line} />
+            <View style={styles.linha} />
 
+            {/* Área dos botões da locação */}
             <View style={styles.areaSubtitulo}>
                 <IconContrato color={COLORS.darkBlue} />
                 <Text style={styles.subtitulo}>Locações</Text>
@@ -100,11 +111,7 @@ export default function DetalhesImovel() {
                 statusImovel={imovel?.status}
             />
 
-            <View style={styles.line} />
-
-
-
-
+            <View style={styles.linha} />
 
         </ScrollView>
     );
@@ -119,13 +126,13 @@ const styles = StyleSheet.create({
         gap: 20,
         paddingTop: 80,
     },
-    loadingContainer: {
+    areaLoading: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: COLORS.white
     },
-    loadingText: {
+    textoLoading: {
         marginTop: 10,
         color: COLORS.darkBlue,
         fontStyle: 'italic'
@@ -143,29 +150,24 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         resizeMode: 'cover'
     },
-
-    textHeader: {
+    textoHeader: {
         flex: 1,
-        justifyContent: 'center',
         alignItems: 'center',
-        paddingLeft: 10,
-
+        justifyContent: 'center',
+        paddingLeft: 20,
     },
     tituloImovel: {
         fontSize: FONT_SIZE.xlarge,
         fontWeight: 'bold',
         color: COLORS.black,
-        textAlign: 'center',
-        width: '100%',
+        textAlign: 'left',
     },
     subtitulo: {
         fontSize: FONT_SIZE.large,
         color: COLORS.darkBlue,
-        textTransform: 'capitalize',
         fontWeight: 'bold',
-        textAlign: 'center',
-        width: '100%',
-        marginTop: 6
+        textAlign: 'left',
+        marginTop: 4,
     },
     statusBanner: {
         width: '100%',
@@ -173,30 +175,20 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginVertical: 15
     },
-    statusText: {
+    textoStatus: {
         color: COLORS.darkBlue,
         fontWeight: 'bold',
-        fontSize: FONT_SIZE.large
+        fontSize: FONT_SIZE.large,
+        marginLeft: -30
     },
-    line: {
+    linha: {
         width: '80%',
         height: 2,
         backgroundColor: COLORS.darkBlue,
     },
-    textHeader: {
-        flex: 1,
-        alignItems: 'flex-start',
-        gap: 5,
-        paddingLeft: 15
-    },
     areaStatus: {
         flexDirection: 'row',
-        gap: 25
-    },
-    subtitulo: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        color: COLORS.darkBlue
+        gap: 40
     },
     areaSubtitulo: {
         gap: 2,

@@ -3,7 +3,7 @@ import { COLORS } from "../../theme/colors";
 import { ButtonDark } from "../ButtonDark";
 import { useRouter } from "expo-router";
 
-export default function DataItem({ imovel }) {
+export default function DadosImovelItem({ imovel }) {
 
     const router = useRouter();
 
@@ -24,70 +24,73 @@ export default function DataItem({ imovel }) {
             </View>
 
             <View style={styles.areaConteudoCard}>
-                <Text style={styles.infoText}>
+                <Text style={styles.textoInfo}>
                     <Text style={styles.bold}>Rua: </Text>
                     {imovel.rua}, {imovel.numero}
                 </Text>
 
-                {imovel.complemento ? <Text style={styles.infoText}>
+                {imovel.complemento ? <Text style={styles.textoInfo}>
                     <Text style={styles.bold}>Complemento: </Text>
                     {imovel.complemento}
                 </Text> : null}
 
-                <Text style={styles.infoText}>
+                <Text style={styles.textoInfo}>
                     <Text style={styles.bold}>Bairro: </Text>
                     {imovel.bairro}
                 </Text>
 
-                <Text style={styles.infoText}>
+                <Text style={styles.textoInfo}>
                     <Text style={styles.bold}>Cidade/Estado: </Text>
                     {imovel.cidade} - {imovel.estado}
                 </Text>
 
-                <Text style={styles.infoText}>
+                <Text style={styles.textoInfo}>
                     <Text style={styles.bold}>CEP: </Text>
                     {imovel.cep}
                 </Text>
 
-                <ButtonDark
-                    title="Editar"
-                    onPress={EditarImovel}
-                />
+                <View style={{ alignItems: 'center' }}>
+                    <ButtonDark
+                        title="Editar"
+                        onPress={EditarImovel}
+                    />
+                </View>
 
                 {imovel.proprietario ? <View>
-                    <View style={styles.line} />
+                    <View style={styles.linha} />
                     <Text style={styles.tituloProprietario}>Proprietário</Text>
 
-                    <Text style={styles.infoText}>
+                    <Text style={styles.textoInfo}>
                         <Text style={styles.bold}>Nome: </Text>
                         {imovel.proprietario.nome}
                     </Text>
 
-                    <Text style={styles.infoText}>
+                    <Text style={styles.textoInfo}>
                         <Text style={styles.bold}>CPF: </Text>
                         {imovel.proprietario.cpf}
                     </Text>
 
-                    <Text style={styles.infoText}>
+                    <Text style={styles.textoInfo}>
                         <Text style={styles.bold}>Data de nascimento: </Text>
                         {imovel.proprietario.dataNascimento}
                     </Text>
 
-                    <Text style={styles.infoText}>
+                    <Text style={styles.textoInfo}>
                         <Text style={styles.bold}>E-mail: </Text>
                         {imovel.proprietario.email}
                     </Text>
 
-                    <Text style={styles.infoText}>
+                    <Text style={styles.textoInfo}>
                         <Text style={styles.bold}>Telefone: </Text>
                         {imovel.proprietario.telefone}
                     </Text>
 
-
-                    <ButtonDark
-                        title="Editar"
-                        onPress={EditarProprietario}
-                    />
+                    <View style={{ alignItems: 'center' }}>
+                        <ButtonDark
+                            title="Editar"
+                            onPress={EditarProprietario}
+                        />
+                    </View>
 
                 </View>
                     : null}
@@ -164,14 +167,14 @@ const styles = StyleSheet.create({
         color: COLORS.darkBlue,
         marginTop: 8,
     },
-    infoText: {
+    textoInfo: {
         fontSize: 16,
         marginVertical: 2
     },
     bold: {
         fontWeight: 'bold'
     },
-    line: {
+    linha: {
         width: '80%',
         height: 2,
         backgroundColor: COLORS.darkBlue,
