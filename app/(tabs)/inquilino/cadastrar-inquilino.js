@@ -30,10 +30,7 @@ export default function CadastrarInquilino() {
         // Validação de campos obrigatórios básicos
         const camposInvalidos =
             !nome.trim() ||
-            !cpf.trim() ||
-            !telefone.trim() ||
-            !email.trim() ||
-            !dataNascimento.trim();
+            !cpf.trim();
 
         if (camposInvalidos) {
             Alert.alert('Campos Obrigatórios', 'Preencha todos os campos do inquilino (*)');
@@ -54,21 +51,26 @@ export default function CadastrarInquilino() {
             // Cria a Pessoa/Inquilino no Backend
             const respostaPessoa = await api.post('/pessoa', dadosPessoa);
 
-            if (respostaPessoa.status === 201 || respostaPessoa.status === 200) {
-                const pessoaIdGerada = respostaPessoa.data?.id;
+            // 2. Só tenta fazer o PUT se os dois IDs existirem de verdade
+            if (locacaoId && pessoaIdGerada) {
 
-                // Vincula a Pessoa recém-criada ao Contrato de Locação existente
-                // PUT no endpoint de atualização da locação
-                if (locacaoId && pessoaIdGerada) {
-                    await api.put('/locacao', {
-                        id: parseInt(locacaoId),
-                        pessoa: parseInt(pessoaIdGerada)
-                    });
-                }
+                const payload = {
+                    id: Number(locacaoId),
+                    pessoa: Number(pessoaIdGerada)
+                };
 
+                console.log("🚀 Enviando para o PUT /locacao:", payload);
+
+                await api.put('/locacao', payload);
+
+                // 🚀 ALERTA CORRIGIDO: Agora avisa e volta direto para a tela do Imóvel específico!
                 Alert.alert('Sucesso!', 'Inquilino cadastrado e vinculado ao contrato com sucesso!', [
-                    { text: 'OK', onPress: () => router.replace('/home') }
+                    {
+                        text: 'OK',
+                        onPress: () => router.replace(`/imovel/${imovelId}`)
+                    }
                 ]);
+
             }
 
         } catch (error) {
@@ -98,7 +100,7 @@ export default function CadastrarInquilino() {
                 <Text style={styles.tituloFormulario}>Dados Pessoais</Text>
 
                 <InputItem
-                    label='Nome completo *'
+                    label='Nome *'
                     placeholder='Digite o nome do inquilino'
                     value={nome}
                     onChangeText={setNome}
@@ -118,34 +120,28 @@ export default function CadastrarInquilino() {
                 />
 
                 <InputItem
-                    label='Telefone *'
+                    label='Telefone'
                     placeholder='(xx) xxxxx-xxxx'
                     value={telefone}
                     keyboardType='phone-pad'
                     onChangeText={setTelefone}
-                    isRequired
-                    error={submitted && !telefone.trim()}
                 />
 
                 <InputItem
-                    label='E-mail *'
+                    label='E-mail'
                     placeholder='inquilino@email.com'
                     value={email}
                     keyboardType='email-address'
                     onChangeText={setEmail}
-                    isRequired
-                    error={submitted && !email.trim()}
                 />
 
                 <InputItem
-                    label='Data de nascimento *'
+                    label='Data de nascimento'
                     placeholder='Formato: dd/mm/aaaa'
                     value={dataNascimento}
                     keyboardType='numeric'
                     maxLength={10}
                     onChangeText={setDataNascimento}
-                    isRequired
-                    error={submitted && !dataNascimento.trim()}
                 />
             </View>
 
