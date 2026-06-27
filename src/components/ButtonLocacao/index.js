@@ -1,8 +1,6 @@
 import React from 'react';
 import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
-
-
 import { COLORS } from '../../theme/colors';
 import { FONT_SIZE } from '../../theme/typography';
 
@@ -21,7 +19,7 @@ export default function ButtonLocacao({ imovelId, statusImovel }) {
                     isCadastroDesativado ? styles.botaoDisabled : styles.botaoDark
                 ]}
                 // Rota direta passando o id do imóvel por parâmetro
-                onPress={() => router.push(`/imovel/cadastrar-locacao?imovelId=${imovelId}`)}
+                onPress={() => router.push(`/locacao/cadastrar-locacao?imovelId=${imovelId}`)}
                 disabled={isCadastroDesativado} 
             >
                 <Text style={styles.textoBotao}>Cadastrar contrato</Text>
@@ -30,7 +28,7 @@ export default function ButtonLocacao({ imovelId, statusImovel }) {
             <TouchableOpacity
                 style={[styles.botao, styles.botaoDark]}
                 // Rota direta para a tela correspondente do histórico
-                // onPress={() => router.push(`/imovel/historico-contratos?imovelId=${imovelId}`)}
+                onPress={() => router.push(`/(tabs)/locacao/historico-locacao?imovelId=${imovelId}`)}
             >
                 <Text style={styles.textoBotao}>Ver histórico</Text>
             </TouchableOpacity>
