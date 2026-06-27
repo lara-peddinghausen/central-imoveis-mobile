@@ -1,35 +1,68 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, Alert } from "react-native";
 import { COLORS } from "../../theme/colors";
 import { ButtonDark } from "../ButtonDark";
 import { useRouter } from "expo-router";
+import { api } from "../../services/api"; // Certifique-se de que o caminho da API está correto
 
-export default function DadosLocacaoItem({ locacao, imovelId }) {
+export default function DadosLocacaoItem({ locacao, imovelId, onAtualizar }) {
     const router = useRouter();
 
-    // Se o imóvel não tiver nenhuma locação ativa/cadastrada, não renderiza nada
     if (!locacao) return null;
 
     const VincularInquilino = () => {
-        router.push(`/inquilino/cadastrar-inquilino?locacaoId=${locacao.id}&imovelId=${imovelId}`);
+        router.push(`/(tabs)/inquilino/cadastrar-inquilino?locacaoId=${locacao.id}&imovelId=${imovelId}`);
     };
 
     const EditarInquilino = () => {
-        router.push(`/inquilino/editar-inquilino?locacaoId=${locacao.id}&imovelId=${imovelId}`);
+        router.push(`/(tabs)/inquilino/editar-inquilino?pessoaId=${locacao.pessoa?.id}&imovelId=${imovelId}`);
     };
 
     const EditarLocacao = () => {
-        router.push(`/inquilino/editar-locacao?locacaoId=${locacao.id}&imovelId=${imovelId}`);
+        router.push(`/(tabs)/locacao/editar-locacao?locacaoId=${locacao.id}&imovelId=${imovelId}`);
+    };
+
+    // Função que chama o endpoint do Spring Boot
+    const cancelarContrato = async () => {
+        Alert.alert(
+            "Confirmar Cancelamento",
+            "Tem certeza que deseja cancelar este contrato? O imóvel voltará a ficar disponível.",
+            [
+                { text: "Voltar", style: "cancel" },
+                {
+                    text: "Sim, Cancelar",
+                    style: "destructive",
+                    onPress: async () => {
+                        try {
+                            await api.put(`/locacao/${locacao.id}/cancelar`);
+                            
+                            Alert.alert("Sucesso", "Contrato cancelado e imóvel liberado!", [
+                                { 
+                                    text: "OK", 
+                                    onPress: () => {
+                                        // Atualiza a tela mãe se a função existir
+                                        if (onAtualizar) {
+                                            onAtualizar();
+                                        }
+                                    } 
+                                }
+                            ]);
+                        } catch (error) {
+                            console.error("Erro ao cancelar locação:", error);
+                            Alert.alert("Erro", "Não foi possível cancelar o contrato no servidor.");
+                        }
+                    }
+                }
+            ]
+        );
     };
 
     return (
         <View style={styles.container}>
 
-            {/* Cabeçalho do Card com estilo unificado */}
             <View style={styles.areaTitulo}>
                 <Text style={styles.titulo}>Contrato Ativo</Text>
             </View>
 
-            {/* Informações do Contrato */}
             <View style={styles.areaConteudo}>
                 <Text style={styles.textoInformacao}>
                     <Text style={styles.bold}>Início: </Text>
@@ -53,14 +86,19 @@ export default function DadosLocacaoItem({ locacao, imovelId }) {
                     </Text>
                 ) : null}
 
-                <View style={{ alignItems: 'center' }}>
+                <View style={styles.areaBotoesAcao}>
                     <ButtonDark
                         title="Editar"
                         onPress={EditarLocacao}
                     />
+                    {/* Botão de Cancelar posicionado logo ao lado ou abaixo do Editar */}
+                    <ButtonDark
+                        title="Cancelar Contrato"
+                        onPress={cancelarContrato}
+                        style={{ backgroundColor: COLORS.red }} // Deixa o botão vermelho para indicar ação crítica
+                    />
                 </View>
 
-                {/* Bloco Condicional do Inquilino */}
                 {locacao.pessoa ? (
                     <View>
                         <View style={styles.linha} />
@@ -90,6 +128,13 @@ export default function DadosLocacaoItem({ locacao, imovelId }) {
                             <Text style={styles.bold}>Telefone: </Text>
                             {locacao.pessoa.telefone}
                         </Text>
+                        
+                        <View style={{ alignItems: 'center' }}>
+                            <ButtonDark
+                                title="Editar Inquilino"
+                                onPress={EditarInquilino}
+                            />
+                        </View>
                     </View>
                 ) : (
                     <View>
@@ -104,16 +149,8 @@ export default function DadosLocacaoItem({ locacao, imovelId }) {
                             />
                         </View>
                     </View>
-
                 )}
-                <View style={{ alignItems: 'center' }}>
-                    <ButtonDark
-                        title="Editar"
-                        onPress={EditarInquilino}
-                    />
-                </View>
             </View>
-
         </View>
     );
 }
@@ -175,5 +212,11 @@ const styles = StyleSheet.create({
         color: COLORS.darkBlue,
         textAlign: 'center',
         marginBottom: 10,
+    },
+    areaBotoesAcao: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        gap: 10,
+        marginTop: 10
     }
 });
