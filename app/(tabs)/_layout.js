@@ -77,7 +77,28 @@ export default function TabsLayout() {
                 }}
             />
             <Tabs.Screen
-                name="imovel/cadastrar-locacao"
+                name="locacao/cadastrar-locacao"
+                options={{
+                    href: null,
+                    headerShown: false
+                }}
+            />
+            <Tabs.Screen
+                name="locacao/editar-locacao"
+                options={{
+                    href: null,
+                    headerShown: false
+                }}
+            />
+            <Tabs.Screen
+                name="locacao/historico-locacao"
+                options={{
+                    href: null,
+                    headerShown: false
+                }}
+            />
+            <Tabs.Screen
+                name="locacao/detalhes-locacao"
                 options={{
                     href: null,
                     headerShown: false
