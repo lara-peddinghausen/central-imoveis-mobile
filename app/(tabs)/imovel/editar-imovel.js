@@ -251,12 +251,6 @@ export default function EditarImovel() {
             <View style={styles.areaBotoes}>
                 {isEditable ? (
                     <>
-                        <ButtonDark
-                            title={salvando ? "Salvando..." : "Salvar"}
-                            onPress={handleSalvar}
-                            disabled={salvando}
-                            flex
-                        />
                         <ButtonLight
                             title="Cancelar"
                             onPress={() => {
@@ -265,17 +259,23 @@ export default function EditarImovel() {
                             }}
                             flex
                         />
+                        <ButtonDark
+                            title={salvando ? "Salvando..." : "Salvar"}
+                            onPress={handleSalvar}
+                            disabled={salvando}
+                            flex
+                        />
                     </>
                 ) : (
                     <>
-                        <ButtonDark
-                            title="Editar"
-                            onPress={() => setIsEditable(true)}
-                            flex
-                        />
                         <ButtonLight
                             title="Voltar"
                             onPress={() => router.replace(`/imovel/${id}`)}
+                            flex
+                        />
+                        <ButtonDark
+                            title="Editar"
+                            onPress={() => setIsEditable(true)}
                             flex
                         />
                     </>

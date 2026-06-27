@@ -25,7 +25,7 @@ export default function EditarProprietario() {
     const [email, setEmail] = useState('');
     const [dataNascimento, setDataNascimento] = useState('');
 
-   const carregarProprietario = async () => {
+    const carregarProprietario = async () => {
         try {
             setCarregando(true);
             const response = await api.get(`/proprietario/${id}`);
@@ -159,12 +159,6 @@ export default function EditarProprietario() {
             <View style={styles.buttonArea}>
                 {isEditable ? (
                     <>
-                        <ButtonDark
-                            title={salvando ? "Salvando..." : "Salvar"}
-                            onPress={handleSalvar}
-                            disabled={salvando}
-                            flex
-                        />
                         <ButtonLight
                             title="Cancelar"
                             onPress={() => {
@@ -173,17 +167,23 @@ export default function EditarProprietario() {
                             }}
                             flex
                         />
+                        <ButtonDark
+                            title={salvando ? "Salvando..." : "Salvar"}
+                            onPress={handleSalvar}
+                            disabled={salvando}
+                            flex
+                        />
                     </>
                 ) : (
                     <>
-                        <ButtonDark
-                            title="Editar"
-                            onPress={() => setIsEditable(true)}
-                            flex
-                        />
                         <ButtonLight
                             title="Voltar"
                             onPress={() => router.replace(`/imovel/${imovelId}`)}
+                            flex
+                        />
+                        <ButtonDark
+                            title="Editar"
+                            onPress={() => setIsEditable(true)}
                             flex
                         />
                     </>
