@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
 import React, { useState, useContext } from 'react';
-import { View, Image, StyleSheet, Alert, ActivityIndicator, Modal, Text } from 'react-native'; // ◄ IMPORTADO MODAL E TEXT
+import { View, Image, StyleSheet, Alert, ActivityIndicator, Modal, Text } from 'react-native'; 
 import { ButtonDark } from "../src/components/ButtonDark";
 import { ButtonLight } from "../src/components/ButtonLight";
 import { COLORS } from '../src/theme/colors';
@@ -14,6 +14,10 @@ export default function Login() {
     const [email, setEmail] = useState('');
     const [senha, setSenha] = useState('');
     const [loading, setLoading] = useState(false);
+
+    const cadastrar = () => {
+        router.push('/cadastrar-administrador');
+    }
 
     // Fazer login
     const entrar = async () => {
@@ -32,13 +36,26 @@ export default function Login() {
             console.error(error);
             
             if (error.response) {
-                if (error.response.status === 500) {
+                const status = error.response.status;
+
+                if (status === 500) {
                     Alert.alert(
                         'Erro no Servidor', 
                         'Não foi possível conectar ao banco de dados. Verifique o status do banco.'
                     );
+                } 
+                // 🚀 TRATAMENTO DO SOFT DELETE / CREDENCIAIS INCORRETAS:
+                else if (status === 401 || status === 403) {
+                    Alert.alert(
+                        'Acesso Rejeitado', 
+                        'E-mail/senha inválidos ou esta conta de administrador foi desativada. Deseja criar um novo perfil?',
+                        [
+                            { text: 'Tentar Novamente', style: 'cancel' },
+                            { text: 'Ir para Cadastro', onPress: cadastrar } // Redireciona com segurança
+                        ]
+                    );
                 } else {
-                    Alert.alert('Erro de Autenticação', 'E-mail ou senha inválidos.');
+                    Alert.alert('Erro', error.response.data?.mensagem || 'Erro ao tentar acessar o sistema.');
                 }
             } else {
                 Alert.alert('Erro de Conexão', 'Não foi possível conectar ao servidor backend.');
@@ -47,10 +64,6 @@ export default function Login() {
             setLoading(false);
         }
     };
-
-    const cadastrar = () => {
-        router.push('/cadastrar-administrador');
-    }
 
     return (
         <View style={styles.container}>
