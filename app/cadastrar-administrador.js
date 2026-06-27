@@ -2,11 +2,11 @@ import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
 import { COLORS } from "../src/theme/colors.js";
 import { FONT_SIZE } from "../src/theme/typography.js";
 import { api } from '../src/services/api.js';
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { ButtonDark } from "../src/components/ButtonDark/index.js";
 import { ButtonLight } from "../src/components/ButtonLight/index.js";
 import InputItem from "../src/components/InputItem/index.js";
-import { useNavigation, useRouter } from "expo-router";
+import { useFocusEffect, useNavigation, useRouter } from "expo-router";
 
 export default function CadastroAdministrador() {
     const router = useRouter();
@@ -19,6 +19,18 @@ export default function CadastroAdministrador() {
     const [cpf, setCpf] = useState('');
     const [senha, setSenha] = useState('');
     const [repetirSenha, setRepetirSenha] = useState('');
+
+    useFocusEffect(
+        useCallback(() => {
+            setNome('');
+            setEmail('');
+            setDataNascimento('');
+            setCpf('');
+            setSenha('');
+            setRepetirSenha('');
+            setSubmitted(false);
+        }, [])
+    );
 
     // Função assíncrona que dispara os dados para o Spring Boot
     const cadastrar = async () => {
@@ -72,7 +84,7 @@ export default function CadastroAdministrador() {
     };
 
     const cancelar = () => {
-        router.back(); 
+        router.back();
     };
 
     return (

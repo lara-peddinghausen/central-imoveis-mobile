@@ -1,12 +1,12 @@
 import { View, Text, StyleSheet, ScrollView, Alert } from 'react-native';
 import { COLORS } from '../../../src/theme/colors.js';
 import InputItem from '../../../src/components/InputItem/index.js';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { api } from '../../../src/services/api.js';
 import { FONT_SIZE } from '../../../src/theme/typography.js';
 import { ButtonDark } from '../../../src/components/ButtonDark/index.js';
 import { ButtonLight } from '../../../src/components/ButtonLight/index.js';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 
 export default function CadastrarProprietario() {
     const router = useRouter();
@@ -21,82 +21,93 @@ export default function CadastrarProprietario() {
     const [email, setEmail] = useState('');
     const [dataNascimento, setDataNascimento] = useState('');
 
+    useFocusEffect(
+        useCallback(() => {
+            setNome('');
+            setCpf('');
+            setTelefone('');
+            setEmail('');
+            setDataNascimento('');
+            setSubmitted(false);
+        }, [])
+    );
+
     const cadastrar = async () => {
-    setSubmitted(true);
+        setSubmitted(true);
 
-    const camposObrigatoriosInvalidos =
-        !nome.trim() ||
-        !cpf.trim();
+        const camposObrigatoriosInvalidos =
+            !nome.trim() ||
+            !cpf.trim();
 
-    if (camposObrigatoriosInvalidos) {
-        Alert.alert('Campos Obrigatórios', 'Preencha todos os campos obrigatórios (*)');
-        return;
-    }
+        if (camposObrigatoriosInvalidos) {
+            Alert.alert('Campos Obrigatórios', 'Preencha todos os campos obrigatórios (*)');
+            return;
+        }
 
-    try {
-        const dadosParaEnvio = {
-            nome,
-            cpf: cpf.replace(/\D/g, ''), 
-            telefone,
-            email,
-            dataNascimento
-        };
+        try {
+            const dadosParaEnvio = {
+                nome,
+                cpf: cpf.replace(/\D/g, ''),
+                telefone,
+                email,
+                dataNascimento
+            };
 
-        // 1. Cadastra o Zezinho no banco
-        const resposta = await api.post('/proprietario', dadosParaEnvio);
+            // 1. Cadastra o Zezinho no banco
+            const resposta = await api.post('/proprietario', dadosParaEnvio);
 
-        if (resposta.status === 201 || resposta.status === 200) {
+            if (resposta.status === 201 || resposta.status === 200) {
 
-            const proprietarioIdGerado = resposta.data?.id;
+                const proprietarioIdGerado = resposta.data?.id;
 
-            // 2. Se veio o imovelId pela URL, faz a mágica do vínculo automático
-            if (imovelId && proprietarioIdGerado) {
-                try {
-                    // 🚀 Bate no @GetMapping("/{id}") que acabamos de adicionar no Java (Adeus erro 404!)
-                    const respostaImovelAtual = await api.get(`/imovel/${imovelId}`);
-                    const imovelDados = respostaImovelAtual.data;
+                // 2. Se veio o imovelId pela URL, faz a mágica do vínculo automático
+                if (imovelId && proprietarioIdGerado) {
+                    try {
+                        // 🚀 Bate no @GetMapping("/{id}") que acabamos de adicionar no Java (Adeus erro 404!)
+                        const respostaImovelAtual = await api.get(`/imovel/${imovelId}`);
+                        const imovelDados = respostaImovelAtual.data;
 
-                    // 🚀 Bate no @PostMapping("/vincular-proprietario") do Java (Adeus erro 403!)
-                    await api.post('/imovel/vincular-proprietario', {
-                        id: parseInt(imovelId),
-                        nome: imovelDados.nome,       
-                        status: imovelDados.status,   
-                        fotoUrl: imovelDados.fotoUrl, 
-                        proprietario: proprietarioIdGerado 
-                    }, {
-                        headers: {
-                            'Authorization': api.defaults.headers.common['Authorization']
-                        }
-                    });
+                        // 🚀 Bate no @PostMapping("/vincular-proprietario") do Java (Adeus erro 403!)
+                        await api.post('/imovel/vincular-proprietario', {
+                            id: parseInt(imovelId),
+                            nome: imovelDados.nome,
+                            status: imovelDados.status,
+                            fotoUrl: imovelDados.fotoUrl,
+                            proprietario: proprietarioIdGerado
+                        }, {
+                            headers: {
+                                'Authorization': api.defaults.headers.common['Authorization']
+                            }
+                        });
 
-                    Alert.alert('Sucesso!', 'Proprietário cadastrado e vinculado ao imóvel com sucesso!', [
-                        { text: 'OK', onPress: () => router.replace('/home') }
-                    ]);
-                    return; 
+                        Alert.alert('Sucesso!', 'Proprietário cadastrado e vinculado ao imóvel com sucesso!', [
+                            { text: 'OK', onPress: () => router.replace('/home') }
+                        ]);
+                        return;
 
-                } catch (erroVinculo) {
-                    console.error("Erro ao vincular:", erroVinculo);
-                    Alert.alert('Aviso', 'Proprietário cadastrado, mas houve uma falha ao vinculá-lo ao imóvel.');
-                    router.replace('/home');
-                    return;
+                    } catch (erroVinculo) {
+                        console.error("Erro ao vincular:", erroVinculo);
+                        Alert.alert('Aviso', 'Proprietário cadastrado, mas houve uma falha ao vinculá-lo ao imóvel.');
+                        router.replace('/home');
+                        return;
+                    }
                 }
+
+                // Fallback caso a tela tenha sido aberta sozinha pelo menu
+                Alert.alert('Sucesso!', 'Proprietário cadastrado com sucesso.', [
+                    { text: 'OK', onPress: () => router.replace('/home') }
+                ]);
             }
 
-            // Fallback caso a tela tenha sido aberta sozinha pelo menu
-            Alert.alert('Sucesso!', 'Proprietário cadastrado com sucesso.', [
-                { text: 'OK', onPress: () => router.replace('/home') }
-            ]);
+        } catch (error) {
+            console.error("Erro requisição cadastro proprietário:", error);
+            if (error.response) {
+                Alert.alert('Erro no Cadastro', error.response.data.mensagem || 'Dados inválidos inseridos.');
+            } else {
+                Alert.alert('Erro de Rede', 'Não foi possível conectar ao servidor.');
+            }
         }
-
-    } catch (error) {
-        console.error("Erro requisição cadastro proprietário:", error);
-        if (error.response) {
-            Alert.alert('Erro no Cadastro', error.response.data.mensagem || 'Dados inválidos inseridos.');
-        } else {
-            Alert.alert('Erro de Rede', 'Não foi possível conectar ao servidor.');
-        }
-    }
-};
+    };
 
     return (
         <ScrollView
@@ -157,8 +168,8 @@ export default function CadastrarProprietario() {
             </View>
 
             <View style={styles.buttonArea}>
-                <ButtonDark title="Cadastrar" onPress={cadastrar} flex />
                 <ButtonLight title="Cancelar" onPress={() => router.replace('/home')} flex />
+                <ButtonDark title="Cadastrar" onPress={cadastrar} flex />
             </View>
         </ScrollView>
     );

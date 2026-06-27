@@ -1,12 +1,12 @@
 import { View, Text, StyleSheet, ScrollView, Alert } from 'react-native';
 import { COLORS } from '../../../src/theme/colors.js';
 import InputItem from '../../../src/components/InputItem/index.js';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { api } from '../../../src/services/api.js';
 import { FONT_SIZE } from '../../../src/theme/typography.js';
 import { ButtonDark } from '../../../src/components/ButtonDark/index.js';
 import { ButtonLight } from '../../../src/components/ButtonLight/index.js';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 
 export default function CadastrarInquilino() {
     const router = useRouter();
@@ -22,6 +22,18 @@ export default function CadastrarInquilino() {
     const [telefone, setTelefone] = useState('');
     const [email, setEmail] = useState('');
     const [dataNascimento, setDataNascimento] = useState('');
+
+    useFocusEffect(
+        useCallback(() => {
+            setNome('');
+            setCpf('');
+            setTelefone('');
+            setEmail('');
+            setDataNascimento('');
+            setSubmitted(false);
+            setSalvando(false);
+        }, [])
+    );
 
     const salvarInquilino = async () => {
 
@@ -162,8 +174,8 @@ export default function CadastrarInquilino() {
             </View>
 
             <View style={styles.areaBotoes}>
-                <ButtonDark title={salvando ? "Salvando..." : "Finalizar"} onPress={salvarInquilino} disabled={salvando} flex />
-                <ButtonLight title="Ignorar" onPress={() => router.replace('/home')} flex />
+                <ButtonLight title="Cancelar" onPress={() => router.replace('/home')} flex />
+                <ButtonDark title={salvando ? "Salvando..." : "Cadastrar"} onPress={salvarInquilino} disabled={salvando} flex />
             </View>
         </ScrollView>
     );
