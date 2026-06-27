@@ -20,41 +20,37 @@ export default function DetalhesImovel() {
 
     const BASE_URL = 'http://10.0.2.2:8080';
 
-    useFocusEffect(
-        useCallback(() => {
-            async function buscarDadosDoBanco() {
+    const buscarDadosDoBanco = useCallback(async () => {
+        try {
+            const responseImovel = await api.get(`/imovel/${id}`);
+            setImovel(responseImovel.data);
+
+            if (responseImovel.data.status === 'ALUGADO') {
                 try {
-                    // Busca segura e autenticada direta do Spring Boot usando o ID
-                    const responseImovel = await api.get(`/imovel/${id}`);
-                    setImovel(responseImovel.data);
-
-                    // 2. Se o imóvel estiver ALUGADO, busca o contrato ativo dele no backend
-                    if (responseImovel.data.status === 'ALUGADO') {
-                        try {
-                            // Certifique-se de ter um endpoint no Java como "/locacao/imovel/{id}" 
-                            // ou trate buscando da sua listagem passando o ID do imóvel.
-                            const responseLocacao = await api.get(`/locacao/imovel/${id}`);
-                            setLocacao(responseLocacao.data);
-                        } catch (locError) {
-                            console.warn("Contrato não encontrado para este imóvel alugado:", locError.message);
-                            setLocacao(null);
-                        }
-                    } else {
-                        setLocacao(null); // Se está disponível, limpa qualquer estado anterior
-                    }
-
-                } catch (error) {
-                    console.error("Erro ao buscar detalhes:", error.message);
-                    Alert.alert('Erro', 'Não foi possível carregar os dados atualizados deste imóvel.');
-                } finally {
-                    setCarregando(false);
+                    const responseLocacao = await api.get(`/locacao/imovel/${id}`);
+                    setLocacao(responseLocacao.data);
+                } catch (locError) {
+                    console.warn("Contrato não encontrado para este imóvel alugado:", locError.message);
+                    setLocacao(null);
                 }
+            } else {
+                setLocacao(null);
             }
 
+        } catch (error) {
+            console.error("Erro ao buscar detalhes:", error.message);
+            Alert.alert('Erro', 'Não foi possível carregar os dados atualizados deste imóvel.');
+        } finally {
+            setCarregando(false);
+        }
+    }, [id]);
+
+    useFocusEffect(
+        useCallback(() => {
             if (id) {
                 buscarDadosDoBanco();
             }
-        }, [id])
+        }, [id, buscarDadosDoBanco])
     );
 
     // Loading na tela
@@ -115,7 +111,7 @@ export default function DetalhesImovel() {
             </View>
 
             {/* Card com dados da locação */}
-            <DadosLocacaoItem locacao={locacao} imovelId={imovel.id} />
+            <DadosLocacaoItem locacao={locacao} imovelId={imovel.id} onAtualizar={buscarDadosDoBanco} />
 
             {/* Card com dados do imóvel */}
             <DadosImovelItem imovel={imovel} />
