@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, ScrollView, Alert } from 'react-native';
 import { COLORS } from '../../src/theme/colors.js';
 import InputItem from '../../src/components/InputItem/index.js';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { apiCorreios } from '../../src/services/api.js';
 import { api } from '../../src/services/api.js';
 import { useAuth } from '../../src/context/AuthContext.js';
@@ -10,7 +10,7 @@ import { FONT_SIZE } from '../../src/theme/typography.js';
 import { ButtonDark } from '../../src/components/ButtonDark/index.js';
 import { ButtonLight } from '../../src/components/ButtonLight/index.js';
 import ImageSelector from '../../src/components/ImageSelector/index.js';
-import { useRouter } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 
 export default function CadastrarImovel() {
     const router = useRouter();
@@ -30,6 +30,23 @@ export default function CadastrarImovel() {
     const [estado, setEstado] = useState('');
     const [tipoLocacao, setTipoLocacao] = useState('RESIDENCIAL');
     const [foto, setFoto] = useState(null);
+
+    useFocusEffect(
+        useCallback(() => {
+            setNome('');
+            setCep('');
+            setRua('');
+            setNumero('');
+            setComplemento('');
+            setBairro('');
+            setCidade('');
+            setEstado('');
+            setTipoLocacao('RESIDENCIAL');
+            setFoto(null);
+            setSubmitted(false);
+            setSalvando(false);
+        }, [])
+    );
 
     const cadastrar = async () => {
         if (!user || !user.id) {
@@ -125,26 +142,26 @@ export default function CadastrarImovel() {
     }
 
 
-async function buscarCepAutomatico(cepDigitado) {
-    const cepLimpo = cepDigitado.replace(/\D/g, '');
-    if (cepLimpo.length === 8) {
-        try {
-            const response = await apiCorreios.get(`/${cepLimpo}/json`);
-            if (response.data.erro === true || response.data.erro === 'true') {
-                alert('Este CEP não foi encontrado. Por favor, verifique os números.');
+    async function buscarCepAutomatico(cepDigitado) {
+        const cepLimpo = cepDigitado.replace(/\D/g, '');
+        if (cepLimpo.length === 8) {
+            try {
+                const response = await apiCorreios.get(`/${cepLimpo}/json`);
+                if (response.data.erro === true || response.data.erro === 'true') {
+                    alert('Este CEP não foi encontrado. Por favor, verifique os números.');
+                    limparCamposEndereco();
+                    return;
+                }
+                setRua(response.data.logradouro || '');
+                setBairro(response.data.bairro || '');
+                setCidade(response.data.localidade || '');
+                setEstado(response.data.uf || '');
+            } catch (error) {
+                console.error("DEBUG CEP:", error.message);
                 limparCamposEndereco();
-                return;
             }
-            setRua(response.data.logradouro || '');
-            setBairro(response.data.bairro || '');
-            setCidade(response.data.localidade || '');
-            setEstado(response.data.uf || '');
-        } catch (error) {
-            console.error("DEBUG CEP:", error.message);
-            limparCamposEndereco();
         }
     }
-}
 
 
     function limparCamposEndereco() {
@@ -259,7 +276,7 @@ async function buscarCepAutomatico(cepDigitado) {
 
                 {/* Foto */}
                 <View style={styles.areaImg}>
-                    <ImageSelector textoBtn = "+ Adicionar imagem" onImageSelected={(uri) => setFoto(uri)} />
+                    <ImageSelector textoBtn="+ Adicionar imagem" onImageSelected={(uri) => setFoto(uri)} />
                 </View>
             </View>
 
@@ -269,8 +286,8 @@ async function buscarCepAutomatico(cepDigitado) {
 
             {/* Botões */}
             <View style={styles.areaBotoes}>
-                <ButtonDark title={salvando ? 'Salvando Imóvel...' : 'Cadastrar Imóvel'} onPress={cadastrar} disabled={salvando} flex />
                 <ButtonLight title="Cancelar" onPress={() => router.replace('/home')} flex />
+                <ButtonDark title={salvando ? 'Salvando Imóvel...' : 'Cadastrar Imóvel'} onPress={cadastrar} disabled={salvando} flex />
             </View>
         </ScrollView >
     );
