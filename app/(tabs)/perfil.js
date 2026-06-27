@@ -12,13 +12,12 @@ import { api } from '../../src/services/api.js';
 
 export default function Perfil() {
     const router = useRouter();
-    const { user, atualizarDadosUser } = useAuth();
+    const { user, atualizarDadosUser, logout } = useAuth(); // 🚀 Importado 'logout' do seu contexto se estiver disponível
 
     const [nome, setNome] = useState('');
     const [email, setEmail] = useState('');
     const [cpf, setCpf] = useState('');
     const [dataNascimento, setDataNascimento] = useState('');
-
     // Controla se os inputs estão bloqueados ou liberados para edição
     const [isEditable, setIsEditable] = useState(false);
 
@@ -38,7 +37,7 @@ export default function Perfil() {
             setNome(user.nome || '');
             setEmail(user.email || '');
             setCpf(user.cpf || '');
-            
+
             // Converte a data do banco antes de salvar no estado da tela
             setDataNascimento(formatarDataParaExibicao(user.dataNascimento));
         }
@@ -46,11 +45,48 @@ export default function Perfil() {
 
     // Logout
     const handleLogout = async () => {
-        await AsyncStorage.removeItem('usuario');
+        if (logout) {
+            await logout();
+        } else {
+            await AsyncStorage.removeItem('usuario');
+        }
         router.replace('/login');
     };
 
-    // Salva as alterações mandando para o backend Java
+    // Dispara a caixa de confirmação de exclusão
+    const handleConfirmarExclusao = () => {
+        Alert.alert(
+            "Excluir Conta",
+            "Tem certeza que deseja excluir permanentemente seu perfil de administrador? Esta ação não pode ser desfeita.",
+            [
+                { text: "Cancelar", style: "cancel" },
+                {
+                    text: "Excluir permanentemente",
+                    style: "destructive",
+                    onPress: handleExcluirPerfil
+                }
+            ]
+        );
+    };
+
+    // Faz a requisição DELETE segura para o endpoint do Spring
+    const handleExcluirPerfil = async () => {
+        try {
+            // Chama o endpoint de exclusão do perfil logado atual baseado no Token JWT
+            const resposta = await api.delete('/administrador/perfil');
+
+            if (resposta.status === 204 || resposta.status === 200) {
+                Alert.alert('Conta Removida', 'Seu perfil de administrador foi excluído com sucesso.');
+
+                // Limpa o estado de login e redireciona
+                await handleLogout();
+            }
+        } catch (error) {
+            console.error("Erro ao excluir administrador:", error);
+            Alert.alert('Erro', 'Não foi possível excluir o seu perfil. Entre em contato com o suporte.');
+        }
+    };
+
     const handleSalvar = async () => {
         try {
             // Garante que se o estado ainda contiver hífens, converte para barras para o Java
@@ -63,7 +99,7 @@ export default function Perfil() {
             const dadosAtualizados = {
                 id: user.id,
                 nome: nome.trim(),
-                dataNascimento: dataFormatada 
+                dataNascimento: dataFormatada
             };
 
             // Envia a requisição PUT para o endpoint do Spring Boot
@@ -71,7 +107,7 @@ export default function Perfil() {
 
             if (resposta.status === 200 || resposta.status === 204) {
                 Alert.alert('Sucesso', 'Perfil atualizado com sucesso!');
-                setIsEditable(false); // Bloqueia os inputs novamente
+                setIsEditable(false);
 
                 if (atualizarDadosUser) {
                     // Atualiza o contexto global do App
@@ -89,7 +125,6 @@ export default function Perfil() {
             contentContainerStyle={styles.container}
             showsVerticalScrollIndicator={false}
         >
-
             {/* Título */}
             <View style={styles.areaTitulo} >
                 <View style={styles.linha} />
@@ -120,9 +155,9 @@ export default function Perfil() {
                     label='CPF'
                     placeholder='Apenas números, sem pontos ou traços'
                     value={cpf}
+                    onChangeText={setCpf}
                     keyboardType='numeric'
                     maxLength={11}
-                    onChangeText={setCpf}
                     editable={false}
                 />
 
@@ -139,11 +174,6 @@ export default function Perfil() {
             <View style={styles.areaBotoes}>
                 {isEditable ? (
                     <>
-                        <ButtonDark
-                            title="Salvar"
-                            onPress={handleSalvar}
-                            flex
-                        />
                         <ButtonLight
                             title="Cancelar"
                             onPress={() => {
@@ -156,22 +186,38 @@ export default function Perfil() {
                             }}
                             flex
                         />
+                        <ButtonDark
+                            title="Salvar"
+                            onPress={handleSalvar}
+                            flex
+                        />
                     </>
                 ) : (
                     <>
-                        <ButtonDark
-                            title="Editar"
-                            onPress={() => setIsEditable(true)}
-                            flex
-                        />
                         <ButtonLight
                             title="Sair da Conta"
                             onPress={handleLogout}
                             flex
                         />
+                        <ButtonDark
+                            title="Editar"
+                            onPress={() => setIsEditable(true)}
+                            flex
+                        />
                     </>
                 )}
             </View>
+
+            {/* Excluir perfil (Só exibe quando não estiver editando) */}
+            {!isEditable && (
+                <View style={styles.areaExcluir}>
+                    <ButtonLight
+                        title="Excluir Perfil Permanentemente"
+                        onPress={handleConfirmarExclusao}
+                        styleText={{ color: COLORS.red }}
+                    />
+                </View>
+            )}
         </ScrollView>
     );
 }
@@ -215,4 +261,8 @@ const styles = StyleSheet.create({
         width: '90%',
         gap: 15,
     },
+    areaExcluir: {
+        width: '90%',
+        marginTop: 10,
+    }
 });
