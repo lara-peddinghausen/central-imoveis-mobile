@@ -1,12 +1,12 @@
 import { View, Text, StyleSheet, ScrollView, Alert } from 'react-native';
 import { COLORS } from '../../../src/theme/colors.js';
 import InputItem from '../../../src/components/InputItem/index.js';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { api } from '../../../src/services/api.js';
 import { FONT_SIZE } from '../../../src/theme/typography.js';
 import { ButtonDark } from '../../../src/components/ButtonDark/index.js';
 import { ButtonLight } from '../../../src/components/ButtonLight/index.js';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 
 export default function CadastrarLocacao() {
     const router = useRouter();
@@ -22,6 +22,18 @@ export default function CadastrarLocacao() {
     const [dataTermino, setDataTermino] = useState('');
     const [aluguel, setAluguel] = useState('');
     const [observacao, setObservacao] = useState('');
+
+    useFocusEffect(
+        useCallback(() => {
+            setDataInicio('');
+            setDataTermino('');
+            setAluguel('');
+            setObservacao('');
+            setSubmitted(false);
+            setSalvando(false);
+            setStatus('ATIVA');
+        }, [])
+    );
 
     const cadastrar = async () => {
         if (salvando) return;
@@ -115,7 +127,7 @@ export default function CadastrarLocacao() {
                     placeholder='Formato: dd/mm/aaaa'
                     value={dataInicio}
                     keyboardType='numeric'
-                    maxLength={10} 
+                    maxLength={10}
                     onChangeText={setDataInicio}
                     isRequired
                     error={submitted && !dataInicio.trim()}
@@ -158,8 +170,8 @@ export default function CadastrarLocacao() {
 
             {/* Botões */}
             <View style={styles.areaBotoes}>
-                <ButtonDark title={salvando ? "Salvando..." : "Cadastrar"} onPress={cadastrar} disabled={salvando} flex />
                 <ButtonLight title="Cancelar" onPress={() => router.replace(`/imovel/${imovelId}`)} flex />
+                <ButtonDark title={salvando ? "Salvando..." : "Cadastrar"} onPress={cadastrar} disabled={salvando} flex />
             </View>
         </ScrollView>
     );
