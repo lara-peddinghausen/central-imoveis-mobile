@@ -19,7 +19,7 @@ api.interceptors.response.use(
       // await AsyncStorage.removeItem('@token');
 
       // Chuta o usuário de volta para a tela de login
-      router.replace('/auth/login');
+      router.replace('/login');
     }
     return Promise.reject(error);
   }
