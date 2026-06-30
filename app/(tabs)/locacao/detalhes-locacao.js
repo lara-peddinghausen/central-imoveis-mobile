@@ -65,73 +65,77 @@ export default function DetalhesContrato() {
             </View>
 
             <View style={{ width: '90%', maxWidth: 350 }}>
-                <ButtonLight title="Voltar para o Histórico" onPress={() => router.back()} flex />
+                <ButtonLight
+                    title="Voltar para o Histórico"
+                    onPress={() => router.replace(`/(tabs)/locacao/historico-locacao?imovelId=${imovelId}`)}
+                    flex
+                />
             </View>
         </ScrollView>
     );
 }
 
 const styles = StyleSheet.create({
-    container: { 
-        paddingTop: 80, 
-        flexGrow: 1, 
-        backgroundColor: COLORS.white, 
-        alignItems: 'center', 
-        gap: 20 
+    container: {
+        paddingTop: 80,
+        flexGrow: 1,
+        backgroundColor: COLORS.white,
+        alignItems: 'center',
+        gap: 20
     },
-    loadingContainer: { 
-        flex: 1, 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        backgroundColor: COLORS.white 
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: COLORS.white
     },
-    cardContrato: { 
-        borderWidth: 1, 
-        borderColor: COLORS.grey, 
-        borderRadius: 10, 
-        width: '90%', 
-        maxWidth: 350, 
-        borderTopWidth: 0, 
-        paddingBottom: 15 
+    cardContrato: {
+        borderWidth: 1,
+        borderColor: COLORS.grey,
+        borderRadius: 10,
+        width: '90%',
+        maxWidth: 350,
+        borderTopWidth: 0,
+        paddingBottom: 15
     },
-    areaTitulo: { 
-        backgroundColor: COLORS.babyBlue, 
-        width: '100%', 
-        height: 40, 
-        alignItems: 'center', 
-        justifyContent: 'center', 
-        borderTopWidth: 1, 
-        borderColor: COLORS.grey, 
-        borderTopLeftRadius: 10, 
-        borderTopRightRadius: 10 
+    areaTitulo: {
+        backgroundColor: COLORS.babyBlue,
+        width: '100%',
+        height: 40,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderTopWidth: 1,
+        borderColor: COLORS.grey,
+        borderTopLeftRadius: 10,
+        borderTopRightRadius: 10
     },
-    titulo: { 
-        fontSize: 18, 
-        fontWeight: 'bold', 
-        color: COLORS.darkBlue 
+    titulo: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: COLORS.darkBlue
     },
-    areaConteudo: { 
-        padding: 15 
+    areaConteudo: {
+        padding: 15
     },
-    textoInformacao: { 
-        fontSize: 16, 
-        marginVertical: 3 
+    textoInformacao: {
+        fontSize: 16,
+        marginVertical: 3
     },
-    bold: { 
-        fontWeight: 'bold' 
+    bold: {
+        fontWeight: 'bold'
     },
-    line: { 
-        width: '80%', 
-        height: 2, 
-        backgroundColor: COLORS.darkBlue, 
-        marginVertical: 15, 
-        alignSelf: 'center' 
+    line: {
+        width: '80%',
+        height: 2,
+        backgroundColor: COLORS.darkBlue,
+        marginVertical: 15,
+        alignSelf: 'center'
     },
-    tituloSecao: { 
-        fontSize: 16, 
-        fontWeight: 'bold', 
-        color: COLORS.darkBlue, 
-        textAlign: 'center', 
-        marginBottom: 10 
+    tituloSecao: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: COLORS.darkBlue,
+        textAlign: 'center',
+        marginBottom: 10
     }
 });

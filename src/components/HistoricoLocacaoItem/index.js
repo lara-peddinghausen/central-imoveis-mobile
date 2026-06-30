@@ -13,12 +13,12 @@ export default function HistoricoLocacaoItem({ locacao, imovelId }) {
 
     const handleVerContrato = () => {
         router.push({
-            pathname: `/(tabs)/locacao/detalhes-contrato`,
+            pathname: `/(tabs)/locacao/detalhes-locacao`,
             params: { locacaoId: locacao.id, imovelId: imovelId }
         });
     };
 
-    const statusFormatado = locacao.status 
+    const statusFormatado = locacao.status
         ? locacao.status.charAt(0).toUpperCase() + locacao.status.slice(1).toLowerCase()
         : '';
 
@@ -74,13 +74,13 @@ const styles = StyleSheet.create({
     container: {
         borderWidth: 1,
         borderColor: COLORS.grey,
-        borderRadius: 10,        
+        borderRadius: 10,
         width: '100%',
         maxWidth: 350,
         paddingBottom: 15,
         marginBottom: 20,
         backgroundColor: COLORS.white,
-        overflow: 'hidden'       
+        overflow: 'hidden'
     },
     areaTitulo: {
         flexDirection: 'row',
