@@ -1,5 +1,9 @@
 # Central de Imóveis - Aplicativo Móvel (Frontend)
 
+## Documentação
+Para a documentação consolidada do projeto, veja [docs/index.md](docs/index.md).
+Para o mapeamento das telas com os endpoints e requisições do backend, consulte [docs/conexoes-backend.md](docs/conexoes-backend.md).
+
 ## Visão Geral
 Este repositório contém o frontend mobile do **Sistema de Administração de Imóveis para Locação**.
 O aplicativo é desenvolvido com **Expo + React Native** e usa **Expo Router** para navegação, **Axios** para consumo de APIs e **AsyncStorage** para manter a sessão do usuário.
@@ -77,20 +81,64 @@ Também há integração com a API ViaCEP em `apiCorreios`:
 ---
 
 ## Instalação e execução
+
 ### Pré-requisitos
-* Node.js
-* Expo CLI (`npm install -g expo-cli`)
-* Emulador Android/iOS ou Expo Go no dispositivo físico
 
-### Comandos
-```bash
-npm install
-npm start
-npm run android
-npm run ios
-npm run web
-```
+- Node.js
+- Android Studio
+- SQL Server
+- Expo CLI
 
+  ```bash
+  npm install -g expo-cli
+  ```
+
+- Um dispositivo virtual Android (AVD) ou o aplicativo Expo Go.
+
+### Configuração
+
+Antes de executar o projeto, realize as seguintes configurações:
+
+1. Crie um banco de dados chamado **`central_imoveis`** no SQL Server.
+   - As tabelas serão criadas automaticamente pelo backend na primeira execução.
+
+2. Configure a conexão com o banco de dados.
+   - No backend, atualize a URL, a porta e as credenciais do SQL Server no arquivo **`application-dev.properties`**.
+
+3. Configure o diretório para upload das imagens dos imóveis.
+   - Crie uma pasta em seu computador para armazenar as imagens.
+   - Atualize o caminho dessa pasta nos seguintes arquivos:
+     - **`CorsConfig.java`** (linha 29);
+     - **`ImovelController.java`**, no método **`cadastrar()`** (linha 57);
+     - **`ImovelController.java`**, no método **`atualizar()`** (linha 145).
+
+4. Para cadastrar imóveis com fotos utilizando o emulador Android, é necessário que existam imagens salvas na galeria do emulador.
+
+### Como rodar o projeto
+
+1. Clone os repositórios [central-imoveis-api](https://github.com/lara-peddinghausen/central-imoveis-api) e [central-imoveis-mobile](https://github.com/lara-peddinghausen/central-imoveis-mobile).
+
+2. Abra ambos os projetos na IDE de sua preferência.
+
+3. No diretório do projeto **`central-imoveis-mobile`**, abra um terminal e instale as dependências:
+
+   ```bash
+   npm install
+   ```
+
+4. No projeto **`central-imoveis-api`**, execute a classe **`ApiApplication.java`**.
+
+   > **Importante:** mantenha o backend (Spring Boot) em execução durante os testes do aplicativo.
+
+5. Abra o **Android Studio** e inicie um dispositivo virtual (Android Virtual Device – AVD).
+
+6. No terminal do diretório **`central-imoveis-mobile`**, execute:
+
+   ```bash
+   npx expo start
+   ```
+
+7. Com o Expo iniciado, pressione a tecla **`a`** no terminal (ou clique em **Run on Android device/emulator**) para abrir o aplicativo no emulador Android.
 ---
 
 ## Estrutura de pastas

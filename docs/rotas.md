@@ -1,5 +1,7 @@
 # Rotas do Projeto
 
+Para o mapeamento técnico das telas com os endpoints e requisições do backend, consulte [conexoes-backend.md](conexoes-backend.md).
+
 ## Estrutura de rotas principais
 O aplicativo usa **Expo Router** para navegação baseada em arquivos.
 
