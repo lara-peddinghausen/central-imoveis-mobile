@@ -8,6 +8,7 @@ import { FONT_SIZE } from '../../../src/theme/typography';
 import DadosImovelItem from '../../../src/components/DadosImovelItem';
 import ButtonLocacao from '../../../src/components/ButtonLocacao';
 import DadosLocacaoItem from '../../../src/components/DadosLocacaoItem';
+import { IMAGES } from '../../../src/assets/images';
 
 
 export default function DetalhesImovel() {
@@ -79,7 +80,7 @@ export default function DetalhesImovel() {
             {/* Header */}
             <View style={styles.header}>
                 <Image
-                    source={imovel.fotoUrl ? { uri: `${BASE_URL}${imovel.fotoUrl}` } : require('../../../src/assets/images/logo3.png')}
+                    source={imovel.fotoUrl ? { uri: `${BASE_URL}${imovel.fotoUrl}` } : IMAGES.imagegNaoCadastrada}
                     style={styles.img}
                 />
                 <View style={styles.textoHeader}>

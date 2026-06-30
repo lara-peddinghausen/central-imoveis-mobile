@@ -17,7 +17,7 @@ export default function ImovelItem({ imovel }) {
 
     const imagemSource = imovel.fotoUrl
         ? { uri: `${BASE_URL}${imovel.fotoUrl}` }
-        : IMAGES.apartamentoX;
+        : IMAGES.imagegNaoCadastrada;
 
     const corStatus = isAlugado
         ? COLORS.yellowCDI

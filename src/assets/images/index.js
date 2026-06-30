@@ -1,5 +1,5 @@
 export const IMAGES = {
-    apartamentoX: require('./apartamentoX.jpg'),
+    imagegNaoCadastrada: require('./imagemNaoCadastrada.png'),
     logo: require('./logo1.png'),
     logo2: require('./logo2.png'),
     logo3: require('./logo3.png'),
