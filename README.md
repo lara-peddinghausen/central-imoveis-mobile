@@ -99,7 +99,11 @@ Também há integração com a API ViaCEP em `apiCorreios`:
 
 Antes de executar o projeto, realize as seguintes configurações:
 
-1. Crie um banco de dados chamado **`central_imoveis`** no SQL Server.
+1. Crie um banco de dados chamado **`central_imoveis`** no SQL Server:
+   ```
+   CREATE DATABASE central_imoveis; 
+   GO
+   ```
    - As tabelas serão criadas automaticamente pelo backend na primeira execução.
 
 2. Configure a conexão com o banco de dados.
